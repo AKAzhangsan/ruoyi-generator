@@ -13,13 +13,27 @@ metadata:
 
 ## 项目路径
 
+路径配置在 `configs/ruoyi-generator.yaml`，安装时由 `install.sh` 自动生成。
+
+```yaml
+# configs/ruoyi-generator.yaml 中的关键配置
+ruoyi_backend: /path/to/ruoyi-backend    # 若依后端路径
+ruoyi_frontend: /path/to/ruoyi-frontend  # 若依前端路径
+database:
+  host: localhost
+  port: 3306
+  name: ry_vue
+  user: ruoyi
+  password: ruoyi123
 ```
-项目根目录: /home/pei16/.openclaw/workspace/projects/ruoyi-generator
-后端路径:   /home/pei16/.openclaw/workspace/projects/ruoyi/ruoyi-backend
-前端路径:   /home/pei16/.openclaw/workspace/projects/ruoyi/ruoyi-frontend
-数据库:     ry_vue@localhost:3306 (user: ruoyi, pass: ruoyi123)
-前端地址:   http://localhost:3000
-后端地址:   http://localhost:8080
+
+## 安装
+
+```bash
+git clone https://github.com/AKAzhangsan/ruoyi-generator.git
+cd ruoyi-generator
+./install.sh
+# 然后编辑 configs/ruoyi-generator.yaml 填写实际路径和数据库信息
 ```
 
 ## 支持的模板类型
@@ -35,8 +49,6 @@ metadata:
 ### 方式一：一键部署（推荐）
 
 ```bash
-cd /home/pei16/.openclaw/workspace/projects/ruoyi-generator
-
 # 单表
 ./scripts/deploy-all.sh configs/schemas/your_table.yaml
 
@@ -57,8 +69,6 @@ cd /home/pei16/.openclaw/workspace/projects/ruoyi-generator
 ### 方式二：四步部署（灵活控制）
 
 ```bash
-cd /home/pei16/.openclaw/workspace/projects/ruoyi-generator
-
 # 第1步: 清理（可选）
 ./scripts/cleanup.sh <table_name> true
 
@@ -88,8 +98,7 @@ cp templates/configs/schema-sub-template.yaml configs/schemas/biz_order.yaml    
 # 4. 一键部署
 ./scripts/deploy-all.sh configs/schemas/crm_customer.yaml
 
-# 5. 访问验证
-# http://localhost:3000  账号: admin / admin123
+# 5. 访问验证: http://localhost:3000  账号: admin / admin123
 ```
 
 ## 三种模板对比
@@ -120,7 +129,7 @@ sub_table:
       is_auto_increment: true
     - name: order_id       # 外键字段必须包含
       type: bigint
-    - name: product_name   # Input 组件
+    - name: product_name   # Input
       component: Input
     - name: item_type      # Select + 字典
       component: Select
@@ -146,19 +155,6 @@ sub_table:
 | DatePicker | 日期选择（自适应列宽） |
 
 不支持：Textarea、Editor、ImageUpload、FileUpload、Checkbox（行内空间限制）
-
-### 主子表字典
-
-主表和子表字典统一在 `dicts` 部分定义，格式和单表完全一致：
-```yaml
-dicts:
-  - dict_type: sys_order_status    # 主表用
-    dict_name: 订单状态
-    data: [...]
-  - dict_type: sys_item_type       # 子表用
-    dict_name: 商品类型
-    data: [...]
-```
 
 ## 树表 Schema 要点
 
@@ -206,20 +202,7 @@ tree_config:
 | `cleanup.sh` | `<表名> true` | 清理代码+删表 |
 | `check-dicts.sh` | `[关键词]` | 查看系统已有字典 |
 | `verify.sh` | `<表名>` | 验证部署结果 |
-| `install.sh` | 无参数 | 安装 Python 依赖 |
-
-## 核心文件
-
-| 文件 | 说明 |
-|------|------|
-| `main_allinone.py` | 生成器入口 |
-| `generator/schema_parser.py` | Schema 解析（含SubTableConfig） |
-| `generator/ruoyi_generator.py` | 代码生成（含子表Entity生成） |
-| `generator/xml_generator.py` | Mapper XML（含嵌套resultMap） |
-| `generator/dict_manager.py` | 字典管理 |
-| `generator/template_engine.py` | Jinja2 模板引擎 |
-| `generator/db_reader.py` | 数据库读写 |
-| `generator/deployer.py` | 部署器 |
+| `install.sh` | 无参数 | 安装为 OpenClaw Skill |
 
 ## 关键约束
 
@@ -227,7 +210,6 @@ tree_config:
 - Checkbox 字段必须用 `varchar` 类型
 - 日期格式用大写：`YYYY-MM-DD`（Day.js 格式）
 - 字典 SQL 使用覆盖模式（先 DELETE 再 INSERT）
-- `create_time` 使用数据库默认值 `DEFAULT CURRENT_TIMESTAMP`
 - BaseEntity 字段（create_by/create_time/update_by/update_time）不在 Entity 中生成
 - TreeEntity 字段（parent_id/ancestors/order_num）不在 Entity 中生成
 - 前端 Vue 模板中字段名使用 Java 驼峰格式（与 JSON 一致）
@@ -240,11 +222,8 @@ tree_config:
 | 字典重复显示 | `deploy-only.sh` 默认覆盖模式，不会重复 |
 | 创建时间为空 | `deploy-only.sh` 自动修复 |
 | 前端 API 找不到 | 检查 `src/api/test/` 下有无 JS 文件 |
-| 编译失败 | 查看 `/tmp/mvn.log` |
-| 后端启动失败 | 查看 `/tmp/ruoyi.log` |
 | 树表平铺展示 | 确认前端 handleTree 参数使用驼峰字段名 |
 | 子表修改不回显 | 确认 XML 详情查询使用嵌套 resultMap |
-| 子表组件被遮挡 | 对话框 960px + 组件 width:100% 自适应 |
 
 ## 详细文档
 

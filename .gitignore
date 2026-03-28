@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 output/
 *.log
+
+# 配置文件（含密码，不提交）
+configs/ruoyi-generator.yaml

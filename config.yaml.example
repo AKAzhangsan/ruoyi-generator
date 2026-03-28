@@ -1,0 +1,52 @@
+# RuoYi Generator 配置文件
+# 复制此文件为 configs/ruoyi-generator.yaml 并填写实际信息
+# install.sh 会自动完成这一步
+
+# ============================================
+# 项目路径配置（必须修改）
+# ============================================
+
+# 若依后端项目路径
+ruoyi_backend: /path/to/ruoyi-backend
+
+# 若依前端项目路径
+ruoyi_frontend: /path/to/ruoyi-frontend
+
+# ============================================
+# 数据库配置（必须修改）
+# ============================================
+
+database:
+  host: localhost
+  port: 3306
+  name: ry_vue
+  user: ruoyi
+  password: ruoyi123
+  charset: utf8mb4
+
+# ============================================
+# 生成器默认配置（可选修改）
+# ============================================
+
+generator:
+  author: ruoyi
+  package_name: com.ruoyi
+  parent_menu_id: 3
+  tpl_web_type: element-plus
+
+# ============================================
+# 目录结构配置（一般无需修改）
+# ============================================
+
+schema_dir: configs/schemas
+config_dir: configs/generated
+output_dir: output
+scripts_dir: scripts
+
+# ============================================
+# 模块映射（可选）
+# ============================================
+
+module_mapping:
+  system: ruoyi-system
+  admin: ruoyi-admin
