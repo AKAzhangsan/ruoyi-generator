@@ -10,6 +10,9 @@ import com.ruoyi.common.annotation.Excel;
 import java.util.List;
 import java.util.ArrayList;
 import com.ruoyi.common.core.domain.TreeEntity;
+{% elif tpl_type == "sub" %}
+import java.util.List;
+import com.ruoyi.common.core.domain.BaseEntity;
 {% else %}
 import com.ruoyi.common.core.domain.BaseEntity;
 {% endif %}
@@ -55,6 +58,11 @@ public class {{ ClassName }} extends {% if tpl_type == "tree" %}TreeEntity{% els
 {% endif %}
 {% endfor %}
 
+{% if tpl_type == "sub" and subClassName is defined %}
+    /** {{ subTableComment }}列表 */
+    private List<{{ subClassName }}> {{ subclassName }}List;
+
+{% endif %}
 {% for column in columns %}
 {% if column.column_name not in skip_columns %}
     public void set{{ column.cap_java_field }}({{ column.java_type }} {{ column.java_field }})
@@ -70,6 +78,18 @@ public class {{ ClassName }} extends {% if tpl_type == "tree" %}TreeEntity{% els
 {% endif %}
 {% endfor %}
 
+{% if tpl_type == "sub" and subClassName is defined %}
+    public List<{{ subClassName }}> get{{ subClassName }}List()
+    {
+        return {{ subclassName }}List;
+    }
+
+    public void set{{ subClassName }}List(List<{{ subClassName }}> {{ subclassName }}List)
+    {
+        this.{{ subclassName }}List = {{ subclassName }}List;
+    }
+
+{% endif %}
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)

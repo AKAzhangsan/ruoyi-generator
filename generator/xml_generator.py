@@ -10,7 +10,8 @@ from datetime import datetime
 
 def generate_mapper_xml(table_name, table_comment, class_name, module_name, 
                         business_name, package_name, columns, pk_column,
-                        tpl_type='crud', tree_config=None):
+                        tpl_type='crud', tree_config=None,
+                        sub_table=None, sub_context=None):
     """
     生成MyBatis XML
     """
@@ -77,6 +78,69 @@ def generate_mapper_xml(table_name, table_comment, class_name, module_name,
     
     update_clause = '\n'.join(update_sets)
     
+
+    # 主子表: 生成子表相关SQL
+    sub_xml_section = ""
+    if tpl_type == 'sub' and sub_context:
+        sc = sub_context
+        sub_cols = sc.get('sub_columns', [])
+        sub_table_name = sc.get('subTableName', '')
+        sub_class = sc.get('subClassName', '')
+        sub_fk_name = sc.get('subTableFkName', '')
+        sub_fk_java = sc.get('subTableFkJavaField', '')
+        sub_fk_cap = sc.get('SubTableFkClassName', '')
+        
+        # 子表 resultMap
+        sub_rm_lines = []
+        for col in sub_cols:
+            tag = "id" if col.get('is_pk') else "result"
+            sub_rm_lines.append(f'        <{tag} property="{col["java_field"]}" column="{col["column_name"]}" />')
+        sub_rm = '\n'.join(sub_rm_lines)
+        
+        # 子表 select 列
+        sub_select_cols = ', '.join([c['column_name'] for c in sub_cols])
+        
+        # 子表 batch insert 列和值
+        sub_insert_cols = ', '.join([c['column_name'] for c in sub_cols if not c.get('is_pk')])
+        sub_insert_vals = ', '.join([f'#{{item.{c["java_field"]}}}' for c in sub_cols if not c.get('is_pk')])
+        
+        sub_xml_section = f"""
+    <resultMap id="{class_name}{sub_class}Result" type="{class_name}" extends="{class_name}Result">
+        <collection property="{sc['subclassName']}List" ofType="{sub_class}" column="{pk_column['column_name']}" select="select{sub_class}List" />
+    </resultMap>
+
+    <resultMap type="{sub_class}" id="{sub_class}Result">
+{sub_rm}
+    </resultMap>
+
+    <select id="select{sub_class}List" resultMap="{sub_class}Result">
+        select {sub_select_cols} from {sub_table_name}
+        where {sub_fk_name} = #{{{sub_fk_name}}}
+    </select>
+
+    <delete id="delete{sub_class}By{sub_fk_cap}s" parameterType="String">
+        delete from {sub_table_name} where {sub_fk_name} in 
+        <foreach item="{sub_fk_java}" collection="array" open="(" separator="," close=")">
+            #{{{sub_fk_java}}}
+        </foreach>
+    </delete>
+
+    <delete id="delete{sub_class}By{sub_fk_cap}" parameterType="{pk_column['java_type']}">
+        delete from {sub_table_name} where {sub_fk_name} = #{{{sub_fk_java}}}
+    </delete>
+
+    <insert id="batch{sub_class}">
+        insert into {sub_table_name}({sub_insert_cols}) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ({sub_insert_vals})
+        </foreach>
+    </insert>"""
+
+    # 确定详情查询使用的 resultMap
+    detail_result_map = class_name + "Result"
+    if tpl_type == 'sub' and sub_context:
+        detail_result_map = class_name + sub_context.get('subClassName', '') + "Result"
+    
     # 组装XML
     xml = f'''<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
@@ -99,7 +163,7 @@ def generate_mapper_xml(table_name, table_comment, class_name, module_name,
         </where>{order_by_clause}
     </select>
 
-    <select id="select{class_name}By{pk_column['cap_java_field']}" parameterType="{pk_column['java_type']}" resultMap="{class_name}Result">
+    <select id="select{class_name}By{pk_column['cap_java_field']}" parameterType="{pk_column['java_type']}" resultMap="{detail_result_map}">
         <include refid="select{class_name}Vo"/>
         where {pk_column['column_name']} = #{{{pk_column['java_field']}}}
     </select>
@@ -133,6 +197,7 @@ def generate_mapper_xml(table_name, table_comment, class_name, module_name,
         </foreach>
     </delete>
 
+{sub_xml_section}
 </mapper>'''
     
     return xml

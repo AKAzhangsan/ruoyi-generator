@@ -1,0 +1,59 @@
+package {{ packageName }}.domain;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import com.ruoyi.common.annotation.Excel;
+import com.ruoyi.common.core.domain.BaseEntity;
+
+/**
+ * {{ subTableComment }}对象 {{ subTableName }}
+ * 
+ * @author {{ author }}
+ * @date {{ datetime }}
+ */
+public class {{ subClassName }} extends BaseEntity
+{
+    private static final long serialVersionUID = 1L;
+
+{% for column in sub_columns %}
+{% if column.column_name not in ['create_by', 'create_time', 'update_by', 'update_time'] %}
+    /** {{ column.column_comment }} */
+{% if column.java_type == 'Date' %}
+    @JsonFormat(pattern = "{{ column.date_format | default('yyyy-MM-dd') }}")
+{% endif %}
+{% if column.is_list and not column.is_pk and column.column_name != subTableFkName %}
+    @Excel(name = "{{ column.column_comment }}")
+{% endif %}
+    private {{ column.java_type }} {{ column.java_field }};
+
+{% endif %}
+{% endfor %}
+
+{% for column in sub_columns %}
+{% if column.column_name not in ['create_by', 'create_time', 'update_by', 'update_time'] %}
+    public void set{{ column.cap_java_field }}({{ column.java_type }} {{ column.java_field }}) 
+    {
+        this.{{ column.java_field }} = {{ column.java_field }};
+    }
+
+    public {{ column.java_type }} get{{ column.cap_java_field }}() 
+    {
+        return {{ column.java_field }};
+    }
+{% endif %}
+{% endfor %}
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+{% for column in sub_columns %}
+{% if column.column_name not in ['create_by', 'create_time', 'update_by', 'update_time'] %}
+            .append("{{ column.java_field }}", get{{ column.cap_java_field }}())
+{% endif %}
+{% endfor %}
+            .toString();
+    }
+}

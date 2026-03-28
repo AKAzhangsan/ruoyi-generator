@@ -70,12 +70,14 @@ else
     done
 fi
 
-# 1. 创建数据库表
+# 1. 创建数据库表（优先使用 SQL 文件，否则用 schema）
 echo "【1/6】创建数据库表..."
-if [ -n "$SCHEMA_FILE" ]; then
-    python3 "$GENERATOR_HOME/main_allinone.py" --schema "$SCHEMA_FILE" --step=create > /dev/null 2>&1 || echo "  表可能已存在"
+if [ -f "$OUTPUT_DIR/sql/create_${TABLE_NAME}.sql" ]; then
+    mysql -hlocalhost -P3306 -u${DB_USER} -p"${DB_PASS}" ${DB_NAME} < "$OUTPUT_DIR/sql/create_${TABLE_NAME}.sql" 2>/dev/null || echo "  表可能已存在"
+elif [ -n "$SCHEMA_FILE" ]; then
+    python3 "$GENERATOR_HOME/main_allinone.py" --schema "$SCHEMA_FILE" --step=create > /dev/null 2>&1 || echo "  表可能已存在（或用SQL文件）"
 else
-    echo "  ⚠️ 未找到 schema 文件，跳过建表"
+    echo "  ⚠️ 未找到建表SQL或schema文件，跳过建表"
 fi
 echo ""
 

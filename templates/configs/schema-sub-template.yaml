@@ -1,0 +1,123 @@
+# ============================================
+# 主子表 Schema 模板 - 主表+子表一对多
+# ============================================
+# 适用场景: 订单+明细、合同+条款、表单+子项等
+#
+# 与单表的区别:
+#   - tpl_type: sub
+#   - 需要 sub_table 配置（子表名、外键、字段）
+#   - 子表 Entity 独立生成
+#   - ServiceImpl 使用 @Transactional 事务
+#   - 前端对话框中有内嵌可编辑子表
+# ============================================
+
+table_name: your_main_table        # 主表名
+table_comment: 你的功能名称          # 主表注释
+module: test                        # 模块名
+business: your_main_table           # 业务名
+function_name: 你的功能名称          # 功能名称
+sort: 1                             # 菜单排序号
+tpl_type: sub                       # ← 关键：指定为主子表
+
+# ---------- 字典定义（主表+子表共用）----------
+dicts:
+  - dict_type: sys_your_status
+    dict_name: 状态
+    sort: 1
+    data:
+      - label: 正常
+        value: '0'
+        sort: 1
+        is_default: Y
+        list_class: success
+      - label: 停用
+        value: '1'
+        sort: 2
+        list_class: danger
+
+# ---------- 子表配置 ----------
+sub_table:
+  table_name: your_sub_table        # 子表名
+  table_comment: 子表功能名称        # 子表注释
+  fk_column: main_id                # 外键字段（关联主表主键）
+  columns:
+    # 子表主键
+    - name: id
+      comment: 子表ID
+      type: bigint
+      is_pk: true
+      is_auto_increment: true
+      is_list: false
+      java_type: Long
+
+    # 外键（前端不显示，后端自动填充）
+    - name: main_id
+      comment: 主表ID
+      type: bigint
+      is_list: false
+      java_type: Long
+
+    # 子表业务字段
+    - name: item_name
+      comment: 名称
+      type: varchar
+      length: 200
+      is_required: true
+      java_type: String
+      component: Input
+
+    - name: quantity
+      comment: 数量
+      type: int
+      java_type: Integer
+      component: InputNumber
+
+    - name: price
+      comment: 单价
+      type: decimal
+      precision: 10
+      scale: 2
+      java_type: BigDecimal
+      component: InputNumber
+
+# ---------- 主表字段定义 ----------
+columns:
+  - name: id
+    comment: 主表ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    java_type: Long
+    component: Input
+
+  - name: name
+    comment: 名称
+    type: varchar
+    length: 100
+    is_required: true
+    query_type: LIKE
+    java_type: String
+    component: Input
+
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    java_type: String
+    component: Radio
+    dict_type: sys_your_status
+
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false
+    is_edit: false
+    is_list: true
+    is_query: false
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss

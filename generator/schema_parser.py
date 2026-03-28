@@ -93,14 +93,34 @@ class TreeConfig:
 
 
 @dataclass
+class SubTableConfig:
+    """主子表专用配置 - 子表配置"""
+    table_name: str = ""            # 子表名
+    table_comment: str = ""         # 子表注释
+    fk_column: str = ""             # 外键字段名（关联主表）
+    columns: List[Column] = field(default_factory=list)  # 子表字段列表
+
+
+
+@dataclass
+class SubTableConfig:
+    """主子表 - 子表配置"""
+    table_name: str = ""
+    table_comment: str = ""
+    fk_column: str = ""          # 外键字段名（关联主表主键）
+    columns: List[Column] = field(default_factory=list)
+
+@dataclass
 class TableSchema:
     """表结构定义"""
     table_name: str = ""
     table_comment: str = ""
     module: str = "system"
     business: str = "info"
-    tpl_type: str = "crud"  # crud=单表, tree=树表, sub=主子表（预留）
+    tpl_type: str = "crud"  # crud=单表, tree=树表, sub=主子表
     tree_config: Optional[TreeConfig] = None  # 树表专用配置
+    sub_table: Optional[SubTableConfig] = None  # 主子表配置
+    sub_table: Optional[SubTableConfig] = None  # 主子表专用配置 - 子表配置
     columns: List[Column] = field(default_factory=list)
     dicts: List[DictItem] = field(default_factory=list)
     gen_config: GenConfig = field(default_factory=GenConfig)
@@ -221,7 +241,92 @@ class SchemaParser:
                 tree_parent_code=tree_data.get('tree_parent_code', 'parent_id'),
                 tree_name=tree_data.get('tree_name', '')
             )
+
+        # 解析主子表配置
+        if table.tpl_type == 'sub':
+            sub_data = table_data.get('sub_table', {})
+            if sub_data:
+                sub_columns = []
+                for col_data in sub_data.get('columns', []):
+                    is_query = col_data.get('is_query', col_data.get('query', False))
+                    column = Column(
+                        name=col_data['name'],
+                        comment=col_data.get('comment', ''),
+                        type=col_data.get('type', 'varchar'),
+                        length=col_data.get('length'),
+                        precision=col_data.get('precision'),
+                        scale=col_data.get('scale'),
+                        is_nullable=col_data.get('is_nullable', True),
+                        default=col_data.get('default'),
+                        is_pk=col_data.get('is_pk', False),
+                        is_auto_increment=col_data.get('is_auto_increment', False),
+                        is_super_column=col_data['name'] in self.BASE_ENTITY_COLUMNS,
+                        java_type=col_data.get('java_type'),
+                        query=is_query,
+                        query_type=col_data.get('query_type', 'EQ'),
+                        is_insert=col_data.get('is_insert', True),
+                        is_edit=col_data.get('is_edit', True),
+                        is_list=col_data.get('is_list', True),
+                        is_required=col_data.get('is_required', False),
+                        component=col_data.get('component', 'Input'),
+                        dict_type=col_data.get('dict_type'),
+                        date_format=col_data.get('date_format'),
+                        limit=col_data.get('limit'),
+                        file_size=col_data.get('file_size'),
+                        file_type=col_data.get('file_type'),
+                        height=col_data.get('height')
+                    )
+                    sub_columns.append(column)
+
+                table.sub_table = SubTableConfig(
+                    table_name=sub_data.get('table_name', ''),
+                    table_comment=sub_data.get('table_comment', ''),
+                    fk_column=sub_data.get('fk_column', ''),
+                    columns=sub_columns
+                )
         
+
+        # 解析主子表配置
+        if table.tpl_type == 'sub':
+            sub_data = table_data.get('sub_table', {})
+            if sub_data:
+                sub_columns = []
+                for col_data in sub_data.get('columns', []):
+                    is_query = col_data.get('is_query', col_data.get('query', False))
+                    col = Column(
+                        name=col_data['name'],
+                        comment=col_data.get('comment', ''),
+                        type=col_data.get('type', 'varchar'),
+                        length=col_data.get('length'),
+                        precision=col_data.get('precision'),
+                        scale=col_data.get('scale'),
+                        is_nullable=col_data.get('is_nullable', True),
+                        default=col_data.get('default'),
+                        is_pk=col_data.get('is_pk', False),
+                        is_auto_increment=col_data.get('is_auto_increment', False),
+                        is_super_column=col_data['name'] in self.BASE_ENTITY_COLUMNS,
+                        java_type=col_data.get('java_type'),
+                        query=is_query,
+                        query_type=col_data.get('query_type', 'EQ'),
+                        is_insert=col_data.get('is_insert', True),
+                        is_edit=col_data.get('is_edit', True),
+                        is_list=col_data.get('is_list', True),
+                        is_required=col_data.get('is_required', False),
+                        component=col_data.get('component', self.COMPONENT_MAPPING.get(col_data.get('type', 'varchar'), 'Input')),
+                        dict_type=col_data.get('dict_type'),
+                        date_format=col_data.get('date_format', self.DATE_FORMAT_MAPPING.get(col_data.get('type', ''), None)),
+                    )
+                    if not col.java_type:
+                        col.java_type = self.MYSQL_TO_JAVA.get(col.type, 'String')
+                    sub_columns.append(col)
+                
+                table.sub_table = SubTableConfig(
+                    table_name=sub_data.get('table_name', ''),
+                    table_comment=sub_data.get('table_comment', ''),
+                    fk_column=sub_data.get('fk_column', ''),
+                    columns=sub_columns,
+                )
+
         # 智能推断 business 名称，避免使用通用的 "info"
         # 优先使用用户指定的值，其次从表名推断
         if 'business' in table_data:
@@ -362,29 +467,40 @@ class SchemaParser:
         return '_'.join(parts)
     
     def generate_ddl(self, table: TableSchema) -> str:
-        """生成CREATE TABLE语句"""
+        """生成CREATE TABLE语句（主子表模式下同时生成子表DDL）"""
+        ddl = self._generate_single_ddl(table)
+
+        # 主子表模式：追加子表DDL
+        if table.tpl_type == 'sub' and table.sub_table:
+            sub_ddl = self._generate_sub_ddl(table.sub_table, table.table_name)
+            ddl += "\n" + sub_ddl
+
+        return ddl
+
+    def _generate_single_ddl(self, table: TableSchema) -> str:
+        """生成单个表的DDL"""
         lines = [f"CREATE TABLE IF NOT EXISTS `{table.table_name}` ("]
-        
+
         column_defs = []
         pk_columns = []
-        
+
         for col in table.columns:
             # 列名和类型
             col_name = col.name
             col_type = self.TYPE_MAPPING.get(col.type, 'VARCHAR')
-            
+
             # 长度
             if col.length and col_type in ['VARCHAR', 'CHAR']:
                 col_type += f"({col.length})"
             elif col.precision is not None and col.scale is not None and col_type == 'DECIMAL':
                 col_type += f"({col.precision},{col.scale})"
-            
+
             # 是否可空（主键必须是NOT NULL）
             if col.is_pk:
                 nullable = "NOT NULL"
             else:
                 nullable = "NULL" if col.is_nullable else "NOT NULL"
-            
+
             # 默认值
             default = ""
             if col.default is not None:
@@ -392,34 +508,137 @@ class SchemaParser:
                     default = f" DEFAULT '{col.default}'"
                 else:
                     default = f" DEFAULT {col.default}"
-            
+
             # 自增
             auto_inc = " AUTO_INCREMENT" if col.is_auto_increment else ""
-            
+
             # 注释
             comment = f" COMMENT '{col.comment}'"
-            
+
             column_defs.append(f"  `{col_name}` {col_type} {nullable}{default}{auto_inc}{comment}")
-            
+
             # 记录主键
             if col.is_pk:
                 pk_columns.append(col_name)
-        
+
         # 所有字段定义后加逗号
         column_defs = [c + "," for c in column_defs]
         lines.extend(column_defs)
-        
+
         # 主键
         if pk_columns:
             pk_line = f"  PRIMARY KEY ({', '.join([f'`{c}`' for c in pk_columns])})"
             lines.append(pk_line)
-        
+
         # 移除最后一个逗号
         if lines and lines[-1].endswith(','):
             lines[-1] = lines[-1][:-1]
-        
+
         lines.append(f") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='{table.table_comment}';\n")
+
+        main_ddl = '\n'.join(lines)
         
+        # 主子表: 追加子表DDL
+        if table.tpl_type == 'sub' and table.sub_table:
+            sub = table.sub_table
+            sub_lines = [f"CREATE TABLE IF NOT EXISTS `{sub.table_name}` ("]
+            sub_col_defs = []
+            sub_pks = []
+            for col in sub.columns:
+                col_type = self.TYPE_MAPPING.get(col.type, 'VARCHAR')
+                if col.length and col_type in ['VARCHAR', 'CHAR']:
+                    col_type += f"({col.length})"
+                elif col.precision is not None and col.scale is not None and col_type == 'DECIMAL':
+                    col_type += f"({col.precision},{col.scale})"
+                nullable = "NOT NULL" if col.is_pk else ("NULL" if col.is_nullable else "NOT NULL")
+                default = ""
+                if col.default is not None:
+                    default = f" DEFAULT '{col.default}'" if isinstance(col.default, str) else f" DEFAULT {col.default}"
+                auto_inc = " AUTO_INCREMENT" if col.is_auto_increment else ""
+                comment = f" COMMENT '{col.comment}'"
+                sub_col_defs.append(f"  `{col.name}` {col_type} {nullable}{default}{auto_inc}{comment}")
+                if col.is_pk:
+                    sub_pks.append(col.name)
+            sub_col_defs = [c + "," for c in sub_col_defs]
+            sub_lines.extend(sub_col_defs)
+            if sub_pks:
+                sub_lines.append(f"  PRIMARY KEY ({', '.join([f'`{c}`' for c in sub_pks])}),")
+            # 外键索引
+            if sub.fk_column:
+                sub_lines.append(f"  KEY `idx_{sub.fk_column}` (`{sub.fk_column}`)")
+            if sub_lines[-1].endswith(','):
+                sub_lines[-1] = sub_lines[-1][:-1]
+            sub_lines.append(f") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='{sub.table_comment}';\n")
+            main_ddl += '\n\n' + '\n'.join(sub_lines)
+        
+        return main_ddl
+
+    def _generate_sub_ddl(self, sub_table: SubTableConfig, main_table_name: str) -> str:
+        """生成子表DDL"""
+        lines = [f"CREATE TABLE IF NOT EXISTS `{sub_table.table_name}` ("]
+
+        column_defs = []
+        pk_columns = []
+        fk_column = sub_table.fk_column
+
+        for col in sub_table.columns:
+            # 列名和类型
+            col_name = col.name
+            col_type = self.TYPE_MAPPING.get(col.type, 'VARCHAR')
+
+            # 长度
+            if col.length and col_type in ['VARCHAR', 'CHAR']:
+                col_type += f"({col.length})"
+            elif col.precision is not None and col.scale is not None and col_type == 'DECIMAL':
+                col_type += f"({col.precision},{col.scale})"
+
+            # 是否可空（主键必须是NOT NULL，外键也NOT NULL）
+            if col.is_pk or col.name == fk_column:
+                nullable = "NOT NULL"
+            else:
+                nullable = "NULL" if col.is_nullable else "NOT NULL"
+
+            # 默认值
+            default = ""
+            if col.default is not None:
+                if isinstance(col.default, str):
+                    default = f" DEFAULT '{col.default}'"
+                else:
+                    default = f" DEFAULT {col.default}"
+
+            # 自增
+            auto_inc = " AUTO_INCREMENT" if col.is_auto_increment else ""
+
+            # 注释
+            comment = f" COMMENT '{col.comment}'"
+
+            column_defs.append(f"  `{col_name}` {col_type} {nullable}{default}{auto_inc}{comment}")
+
+            # 记录主键
+            if col.is_pk:
+                pk_columns.append(col_name)
+
+        # 所有字段定义后加逗号
+        column_defs = [c + "," for c in column_defs]
+        lines.extend(column_defs)
+
+        # 主键
+        if pk_columns:
+            pk_line = f"  PRIMARY KEY ({', '.join([f'`{c}`' for c in pk_columns])}),"
+            lines.append(pk_line)
+
+        # 外键索引
+        if fk_column:
+            idx_name = f"idx_{sub_table.table_name}_{fk_column}"
+            idx_line = f"  KEY `{idx_name}` (`{fk_column}`)"
+            lines.append(idx_line)
+
+        # 移除最后一个逗号
+        if lines and lines[-1].endswith(','):
+            lines[-1] = lines[-1][:-1]
+
+        lines.append(f") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='{sub_table.table_comment}';\n")
+
         return '\n'.join(lines)
     
     def generate_field_info(self, table: TableSchema) -> Dict[str, Any]:
@@ -472,7 +691,7 @@ class SchemaParser:
         lines.append(f"function_name: {table.gen_config.function_name}")
         lines.append(f"sort: 1  # 菜单排序号")
 
-        # 树表配置输出
+        # 树表/主子表配置输出
         if table.tpl_type != "crud":
             lines.append(f"tpl_type: {table.tpl_type}")
         if table.tree_config:
@@ -480,6 +699,45 @@ class SchemaParser:
             lines.append(f"  tree_code: {table.tree_config.tree_code}")
             lines.append(f"  tree_parent_code: {table.tree_config.tree_parent_code}")
             lines.append(f"  tree_name: {table.tree_config.tree_name}")
+
+        # 主子表配置输出
+        if table.sub_table:
+            lines.append("sub_table:")
+            lines.append(f"  table_name: {table.sub_table.table_name}")
+            lines.append(f"  table_comment: {table.sub_table.table_comment}")
+            lines.append(f"  fk_column: {table.sub_table.fk_column}")
+            lines.append("  columns:")
+            for col in table.sub_table.columns:
+                lines.append(f"    - name: {col.name}")
+                lines.append(f"      comment: {col.comment}")
+                lines.append(f"      type: {col.type}")
+                if col.length:
+                    lines.append(f"      length: {col.length}")
+                if col.precision is not None:
+                    lines.append(f"      precision: {col.precision}")
+                if col.scale is not None:
+                    lines.append(f"      scale: {col.scale}")
+                if col.is_pk:
+                    lines.append(f"      is_pk: true")
+                if col.is_auto_increment:
+                    lines.append(f"      is_auto_increment: true")
+                if not col.is_nullable:
+                    lines.append(f"      is_nullable: false")
+                if col.default is not None:
+                    if isinstance(col.default, str):
+                        lines.append(f"      default: '{col.default}'")
+                    else:
+                        lines.append(f"      default: {col.default}")
+                # 主子表：子表字段简化输出（默认使用Input/InputNumber/DatePicker）
+                java_type = col.java_type if col.java_type else self.MYSQL_TO_JAVA.get(col.type, 'String')
+                component = col.component if col.component else self.COMPONENT_MAPPING.get(col.type, 'Input')
+                lines.append(f"      java_type: {java_type}")
+                lines.append(f"      component: {component}")
+                if col.dict_type:
+                    lines.append(f"      dict_type: {col.dict_type}")
+                if col.date_format:
+                    lines.append(f"      date_format: {col.date_format}")
+                lines.append("")
 
         lines.append("")
         lines.append("columns:")

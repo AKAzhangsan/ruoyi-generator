@@ -2,6 +2,9 @@ package {{ packageName }}.mapper;
 
 import java.util.List;
 import {{ packageName }}.domain.{{ ClassName }};
+{% if tpl_type == "sub" and subClassName is defined %}
+import {{ packageName }}.domain.{{ subClassName }};
+{% endif %}
 
 /**
  * {{ functionName }}Mapper接口
@@ -58,4 +61,30 @@ public interface {{ ClassName }}Mapper
      * @return 结果
      */
     public int delete{{ ClassName }}By{{ pkColumn.cap_java_field }}s({{ pkColumn.java_type }}[] {{ pkColumn.java_field }}s);
+{% if tpl_type == "sub" and subClassName is defined %}
+
+    /**
+     * 批量删除{{ subTableComment }}
+     * 
+     * @param {{ pkColumn.java_field }}s 需要删除的数据主键集合
+     * @return 结果
+     */
+    public int delete{{ subClassName }}By{{ SubTableFkClassName }}s({{ pkColumn.java_type }}[] {{ pkColumn.java_field }}s);
+
+    /**
+     * 批量新增{{ subTableComment }}
+     * 
+     * @param {{ subclassName }}List {{ subTableComment }}列表
+     * @return 结果
+     */
+    public int batch{{ subClassName }}(List<{{ subClassName }}> {{ subclassName }}List);
+
+    /**
+     * 通过{{ functionName }}主键删除{{ subTableComment }}信息
+     * 
+     * @param {{ pkColumn.java_field }} {{ functionName }}ID
+     * @return 结果
+     */
+    public int delete{{ subClassName }}By{{ SubTableFkClassName }}({{ pkColumn.java_type }} {{ pkColumn.java_field }});
+{% endif %}
 }

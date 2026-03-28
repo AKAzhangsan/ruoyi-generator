@@ -1,0 +1,158 @@
+# 主子表全组件测试
+table_name: test_order
+table_comment: 订单管理
+module: test
+business: test_order
+function_name: 订单管理
+sort: 3
+tpl_type: sub
+
+dicts:
+  - dict_type: sys_sub_order_status
+    dict_name: 订单状态
+    sort: 1
+    data:
+      - label: 待付款
+        value: '0'
+        sort: 1
+        is_default: Y
+        list_class: warning
+      - label: 已付款
+        value: '1'
+        sort: 2
+        list_class: success
+      - label: 已取消
+        value: '2'
+        sort: 3
+        list_class: danger
+  - dict_type: sys_sub_item_type
+    dict_name: 商品类型
+    sort: 2
+    data:
+      - label: 实物商品
+        value: '1'
+        sort: 1
+        is_default: Y
+        list_class: primary
+      - label: 虚拟商品
+        value: '2'
+        sort: 2
+        list_class: info
+
+sub_table:
+  table_name: test_order_item
+  table_comment: 订单明细
+  fk_column: order_id
+  columns:
+    - name: item_id
+      comment: 明细ID
+      type: bigint
+      is_pk: true
+      is_auto_increment: true
+      is_list: false
+      java_type: Long
+
+    - name: order_id
+      comment: 订单ID
+      type: bigint
+      is_list: false
+      java_type: Long
+
+    # Input 组件
+    - name: product_name
+      comment: 商品名称
+      type: varchar
+      length: 200
+      is_required: true
+      java_type: String
+      component: Input
+
+    # Select 组件（自定义字典）
+    - name: item_type
+      comment: 商品类型
+      type: char
+      length: 1
+      java_type: String
+      component: Select
+      dict_type: sys_sub_item_type
+
+    # InputNumber 组件
+    - name: quantity
+      comment: 数量
+      type: int
+      is_required: true
+      java_type: Integer
+      component: InputNumber
+
+    # InputNumber 组件（小数）
+    - name: price
+      comment: 单价
+      type: decimal
+      precision: 10
+      scale: 2
+      java_type: BigDecimal
+      component: InputNumber
+
+    # DatePicker 组件
+    - name: delivery_date
+      comment: 交付日期
+      type: date
+      java_type: Date
+      component: DatePicker
+      date_format: YYYY-MM-DD
+
+columns:
+  - name: order_id
+    comment: 订单ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    java_type: Long
+
+  - name: order_no
+    comment: 订单编号
+    type: varchar
+    length: 64
+    is_required: true
+    java_type: String
+    component: Input
+
+  - name: customer_name
+    comment: 客户名称
+    type: varchar
+    length: 100
+    is_required: true
+    query_type: LIKE
+    java_type: String
+    component: Input
+
+  - name: total_amount
+    comment: 总金额
+    type: decimal
+    precision: 10
+    scale: 2
+    java_type: BigDecimal
+    component: InputNumber
+
+  - name: status
+    comment: 订单状态
+    type: char
+    length: 1
+    java_type: String
+    component: Radio
+    dict_type: sys_sub_order_status
+
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false
+    is_edit: false
+    is_list: true
+    is_query: false
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss

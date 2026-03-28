@@ -1,6 +1,12 @@
 package {{ packageName }}.service.impl;
 
 import java.util.List;
+{% if tpl_type == "sub" and subClassName is defined %}
+import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
+import com.ruoyi.common.utils.StringUtils;
+import {{ packageName }}.domain.{{ subClassName }};
+{% endif %}
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import {{ packageName }}.mapper.{{ ClassName }}Mapper;
@@ -38,7 +44,7 @@ public class {{ ClassName }}ServiceImpl implements I{{ ClassName }}Service
      * @return {{ functionName }}
      */
     @Override
-    public List\u003c{{ ClassName }}\u003e select{{ ClassName }}List({{ ClassName }} {{ className }})
+    public List<{{ ClassName }}> select{{ ClassName }}List({{ ClassName }} {{ className }})
     {
         return {{ className }}Mapper.select{{ ClassName }}List({{ className }});
     }
@@ -49,10 +55,19 @@ public class {{ ClassName }}ServiceImpl implements I{{ ClassName }}Service
      * @param {{ className }} {{ functionName }}
      * @return 结果
      */
+{% if tpl_type == "sub" and subClassName is defined %}
+    @Transactional
+{% endif %}
     @Override
     public int insert{{ ClassName }}({{ ClassName }} {{ className }})
     {
+{% if tpl_type == "sub" and subClassName is defined %}
+        int rows = {{ className }}Mapper.insert{{ ClassName }}({{ className }});
+        insert{{ subClassName }}({{ className }});
+        return rows;
+{% else %}
         return {{ className }}Mapper.insert{{ ClassName }}({{ className }});
+{% endif %}
     }
 
     /**
@@ -61,9 +76,16 @@ public class {{ ClassName }}ServiceImpl implements I{{ ClassName }}Service
      * @param {{ className }} {{ functionName }}
      * @return 结果
      */
+{% if tpl_type == "sub" and subClassName is defined %}
+    @Transactional
+{% endif %}
     @Override
     public int update{{ ClassName }}({{ ClassName }} {{ className }})
     {
+{% if tpl_type == "sub" and subClassName is defined %}
+        {{ className }}Mapper.delete{{ subClassName }}By{{ SubTableFkClassName }}({{ className }}.get{{ pkColumn.cap_java_field }}());
+        insert{{ subClassName }}({{ className }});
+{% endif %}
         return {{ className }}Mapper.update{{ ClassName }}({{ className }});
     }
 
@@ -73,9 +95,15 @@ public class {{ ClassName }}ServiceImpl implements I{{ ClassName }}Service
      * @param {{ pkColumn.java_field }}s 需要删除的{{ functionName }}主键
      * @return 结果
      */
+{% if tpl_type == "sub" and subClassName is defined %}
+    @Transactional
+{% endif %}
     @Override
     public int delete{{ ClassName }}By{{ pkColumn.cap_java_field }}s({{ pkColumn.java_type }}[] {{ pkColumn.java_field }}s)
     {
+{% if tpl_type == "sub" and subClassName is defined %}
+        {{ className }}Mapper.delete{{ subClassName }}By{{ SubTableFkClassName }}s({{ pkColumn.java_field }}s);
+{% endif %}
         return {{ className }}Mapper.delete{{ ClassName }}By{{ pkColumn.cap_java_field }}s({{ pkColumn.java_field }}s);
     }
 
@@ -85,9 +113,41 @@ public class {{ ClassName }}ServiceImpl implements I{{ ClassName }}Service
      * @param {{ pkColumn.java_field }} {{ functionName }}主键
      * @return 结果
      */
+{% if tpl_type == "sub" and subClassName is defined %}
+    @Transactional
+{% endif %}
     @Override
     public int delete{{ ClassName }}By{{ pkColumn.cap_java_field }}({{ pkColumn.java_type }} {{ pkColumn.java_field }})
     {
+{% if tpl_type == "sub" and subClassName is defined %}
+        {{ className }}Mapper.delete{{ subClassName }}By{{ SubTableFkClassName }}({{ pkColumn.java_field }});
+{% endif %}
         return {{ className }}Mapper.delete{{ ClassName }}By{{ pkColumn.cap_java_field }}({{ pkColumn.java_field }});
     }
+{% if tpl_type == "sub" and subClassName is defined %}
+
+    /**
+     * 新增{{ subTableComment }}信息
+     * 
+     * @param {{ className }} {{ functionName }}对象
+     */
+    public void insert{{ subClassName }}({{ ClassName }} {{ className }})
+    {
+        List<{{ subClassName }}> {{ subclassName }}List = {{ className }}.get{{ subClassName }}List();
+        {{ pkColumn.java_type }} {{ pkColumn.java_field }} = {{ className }}.get{{ pkColumn.cap_java_field }}();
+        if (StringUtils.isNotNull({{ subclassName }}List))
+        {
+            List<{{ subClassName }}> list = new ArrayList<{{ subClassName }}>();
+            for ({{ subClassName }} {{ subclassName }} : {{ subclassName }}List)
+            {
+                {{ subclassName }}.set{{ SubTableFkClassName }}({{ pkColumn.java_field }});
+                list.add({{ subclassName }});
+            }
+            if (list.size() > 0)
+            {
+                {{ className }}Mapper.batch{{ subClassName }}(list);
+            }
+        }
+    }
+{% endif %}
 }

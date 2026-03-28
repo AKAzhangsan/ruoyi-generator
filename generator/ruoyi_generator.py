@@ -334,7 +334,57 @@ class RuoYiGenerator:
 
             # 模板web类型
             'tpl_web_type': table.gen_config.tpl_web_type if hasattr(table, 'gen_config') else 'element-plus',
+            
+            # 主子表配置
+            'sub_table': table.sub_table if hasattr(table, 'sub_table') else None,
         }
+        
+        # 主子表上下文补充
+        if context.get('tpl_type') == 'sub' and context.get('sub_table'):
+            sub = context['sub_table']
+            sub_class_name = self._to_pascal_case(sub.table_name)
+            sub_class_name_lower = sub_class_name[0].lower() + sub_class_name[1:]
+            fk_camel = self._to_camel_case(sub.fk_column)
+            fk_cap = fk_camel[0].upper() + fk_camel[1:]
+            
+            # 构建子表字段列表
+            sub_columns = []
+            for col in sub.columns:
+                col_dict = {
+                    'column_name': col.name,
+                    'java_field': self._to_camel_case(col.name),
+                    'java_type': col.java_type or 'String',
+                    'column_comment': col.comment or col.name,
+                    'is_pk': col.is_pk,
+                    'is_required': col.is_required,
+                    'dict_type': col.dict_type,
+                    'component': col.component,
+                    'date_format': col.date_format,
+                    'length': col.length,
+                    'numeric_scale': col.scale,
+                }
+                sub_columns.append(col_dict)
+            
+            context['sub_context'] = {
+                'subClassName': sub_class_name,
+                'subclassName': sub_class_name_lower,
+                'subTableName': sub.table_name,
+                'subTableComment': sub.table_comment,
+                'subFkName': sub.fk_column,
+                'subFkJavaField': fk_camel,
+                'subFkCap': fk_cap,
+                'sub_columns': sub_columns,
+            }
+            # 快捷变量
+            sc = context['sub_context']
+            context['subTableName'] = sc['subTableName']
+            context['subTableComment'] = sc['subTableComment']
+            context['subFkName'] = sc['subFkName']
+            context['subFkJavaField'] = sc['subFkJavaField']
+            context['subFkCap'] = sc['subFkCap']
+            context['sub_columns'] = sc['sub_columns']
+            context['subClassName'] = sc['subClassName']
+            context['subclassName'] = sc['subclassName']
 
         return context
     
@@ -465,6 +515,17 @@ class RuoYiGenerator:
         )
         print(f"  ✓ Entity: {class_name}.java")
         
+        # 1.1 子表 Entity（主子表模式）
+        if context.get('tpl_type') == 'sub' and context.get('sub_context'):
+            sub_class = context['sub_context']['subClassName']
+            sub_context = {**context, **context['sub_context']}
+            content = self.template_engine.render('java/sub-entity.java.j2', sub_context)
+            self.writer.write(
+                f"main/java/{self.package_name.replace('.', '/')}/{module}/domain/{sub_class}.java",
+                content
+            )
+            print(f"  ✓ Sub Entity: {sub_class}.java")
+        
         # 2. Mapper接口
         content = self.template_engine.render('java/mapper.java.j2', context)
         self.writer.write(
@@ -534,6 +595,8 @@ class RuoYiGenerator:
         tpl_type = context.get('tpl_type', 'crud')
         if tpl_type == 'tree':
             vue_template = 'vue/index-tree.vue.j2'
+        elif tpl_type == 'sub':
+            vue_template = 'vue/index-sub.vue.j2'
         else:
             vue_template = 'vue/index.vue.j2'
 
