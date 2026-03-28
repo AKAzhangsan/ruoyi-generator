@@ -1,0 +1,316 @@
+# RuoYi 代码生成器 - 完整字段配置模板
+# 包含所有支持的字段属性
+
+tables:
+  - table_name: demo_config
+    table_comment: 演示配置表
+    module: system
+    business: config
+    
+    # 生成配置
+    gen_config:
+      tpl_web_type: element-plus    # 前端模板类型: element-plus / ant-design
+      function_name: 演示配置        # 功能名称（用于菜单、页面标题）
+      business_name: config         # 业务名称
+      class_name: DemoConfig        # 实体类名
+      package_name: com.ruoyi.system # 包名
+      author: ruoyi                 # 作者
+    
+    # 字典配置
+    dicts:
+      - dict_type: sys_status       # 字典类型
+        dict_name: 状态             # 字典名称
+        sort: 1                     # 排序
+        
+    columns:
+      # ========== 示例1: 主键字段 ==========
+      - name: id
+        comment: 主键ID
+        type: bigint
+        is_pk: true
+        is_auto_increment: true
+        is_nullable: false
+        
+        # 查询配置
+        query: false                # 是否查询字段
+        query_type: EQ              # 查询方式: EQ(=), NE(!=), GT(>), GE(>=), LT(<), LE(<=), LIKE, BETWEEN
+        
+        # 表单配置
+        is_insert: false            # 是否插入字段
+        is_edit: false              # 是否编辑字段
+        is_list: true               # 是否列表显示
+        
+        # 组件配置
+        component: Input            # 组件类型: Input, Textarea, Select, Radio, Checkbox, DatePicker, InputNumber
+        
+      # ========== 示例2: 普通文本字段 ==========
+      - name: config_name
+        comment: 配置名称
+        type: varchar
+        length: 100
+        is_nullable: false
+        default: ''
+        
+        query: true
+        query_type: LIKE            # 模糊查询
+        
+        is_insert: true
+        is_edit: true
+        is_list: true
+        
+        component: Input
+        
+      # ========== 示例3: 下拉选择字段（字典） ==========
+      - name: status
+        comment: 状态
+        type: char
+        length: 1
+        is_nullable: false
+        default: '0'
+        
+        query: true
+        query_type: EQ
+        
+        is_insert: true
+        is_edit: true
+        is_list: true
+        
+        component: Select           # 下拉选择组件
+        dict_type: sys_status       # 关联字典类型
+        
+      # ========== 示例4: 单选字段 ==========
+      - name: config_type
+        comment: 配置类型
+        type: varchar
+        length: 20
+        is_nullable: false
+        default: 'default'
+        
+        query: true
+        query_type: EQ
+        
+        is_insert: true
+        is_edit: true
+        is_list: true
+        
+        component: Radio            # 单选组件
+        dict_type: sys_config_type  # 关联字典
+        
+      # ========== 示例5: 多选字段 ==========
+      - name: permissions
+        comment: 权限标识
+        type: varchar
+        length: 200
+        is_nullable: true
+        
+        query: false
+        
+        is_insert: true
+        is_edit: true
+        is_list: false
+        
+        component: Checkbox         # 多选组件
+        dict_type: sys_permission   # 关联字典
+        
+      # ========== 示例6: 日期字段 ==========
+      - name: effect_date
+        comment: 生效日期
+        type: date
+        is_nullable: true
+        
+        query: true
+        query_type: BETWEEN         # 范围查询
+        
+        is_insert: true
+        is_edit: true
+        is_list: true
+        
+        component: DatePicker       # 日期选择器
+        date_format: yyyy-MM-dd     # 日期格式
+        
+      # ========== 示例7: 日期时间字段 ==========
+      - name: start_time
+        comment: 开始时间
+        type: datetime
+        is_nullable: true
+        
+        query: true
+        query_type: BETWEEN
+        
+        is_insert: true
+        is_edit: true
+        is_list: true
+        
+        component: DatePicker
+        date_format: yyyy-MM-dd HH:mm:ss
+        
+      # ========== 示例8: 数字字段 ==========
+      - name: sort_order
+        comment: 排序号
+        type: int
+        is_nullable: false
+        default: 0
+        
+        query: false
+        
+        is_insert: true
+        is_edit: true
+        is_list: true
+        
+        component: InputNumber      # 数字输入框
+        
+      # ========== 示例9: 金额字段 ==========
+      - name: amount
+        comment: 金额
+        type: decimal
+        precision: 10
+        scale: 2
+        is_nullable: true
+        default: 0.00
+        
+        query: true
+        query_type: BETWEEN
+        
+        is_insert: true
+        is_edit: true
+        is_list: true
+        
+        component: InputNumber
+        
+      # ========== 示例10: 多行文本字段 ==========
+      - name: remark
+        comment: 备注
+        type: text
+        is_nullable: true
+        
+        query: false
+        
+        is_insert: true
+        is_edit: true
+        is_list: false             # 列表不显示长文本
+        
+        component: Textarea         # 多行文本
+        
+      # ========== 示例11: 系统字段（自动生成） ==========
+      - name: create_time
+        comment: 创建时间
+        type: datetime
+        is_nullable: true
+        
+        query: true
+        query_type: BETWEEN
+        
+        is_insert: false            # 系统字段，不显示在表单
+        is_edit: false
+        is_list: true
+        
+        component: DatePicker
+        
+      - name: update_time
+        comment: 更新时间
+        type: datetime
+        is_nullable: true
+        
+        query: false
+        
+        is_insert: false
+        is_edit: false
+        is_list: true
+        
+        component: DatePicker
+        
+      - name: create_by
+        comment: 创建者
+        type: varchar
+        length: 64
+        is_nullable: true
+        
+        query: false
+        
+        is_insert: false
+        is_edit: false
+        is_list: true
+        
+        component: Input
+        
+      - name: update_by
+        comment: 更新者
+        type: varchar
+        length: 64
+        is_nullable: true
+        
+        query: false
+        
+        is_insert: false
+        is_edit: false
+        is_list: false
+        
+        component: Input
+
+# 完整字段属性说明:
+#
+# === 基础属性 ===
+# name: 字段名（必填）
+# comment: 字段注释（必填）
+# type: 数据类型（必填）
+#   - 数值: bigint, int, tinyint, smallint, decimal
+#   - 字符串: varchar, char, text, longtext
+#   - 日期: datetime, timestamp, date, time
+#   - 二进制: blob
+# length: 长度（varchar/char 需要）
+# precision: 精度（decimal 需要）
+# scale: 小数位（decimal 需要）
+# is_nullable: 是否可空（默认 true）
+# default: 默认值
+# is_pk: 是否主键（默认 false）
+# is_auto_increment: 是否自增（默认 false）
+#
+# === 查询配置 ===
+# query: 是否作为查询条件（默认 false）
+# query_type: 查询方式
+#   - EQ: 等于 (=)
+#   - NE: 不等于 (!=)
+#   - GT: 大于 (>)
+#   - GE: 大于等于 (>=)
+#   - LT: 小于 (<)
+#   - LE: 小于等于 (<=)
+#   - LIKE: 模糊查询
+#   - BETWEEN: 范围查询（日期/数字）
+#
+# === 表单配置 ===
+# is_insert: 是否插入字段（默认 true）
+# is_edit: 是否编辑字段（默认 true）
+# is_list: 是否列表显示（默认 true）
+# is_required: 是否必填（默认 false）
+#
+# === 组件配置 ===
+# component: 表单组件类型
+#   - Input: 文本输入框
+#   - Textarea: 多行文本框
+#   - Select: 下拉选择
+#   - Radio: 单选框
+#   - Checkbox: 多选框
+#   - DatePicker: 日期选择器
+#   - InputNumber: 数字输入框
+#   - Switch: 开关
+# dict_type: 关联的字典类型（Select/Radio/Checkbox 需要）
+# date_format: 日期格式（DatePicker 需要）
+#   - yyyy-MM-dd
+#   - yyyy-MM-dd HH:mm:ss
+#   - HH:mm:ss
+#
+# === 生成配置 ===
+# tpl_web_type: 前端模板类型
+#   - element-plus: Element Plus 组件（默认）
+#   - ant-design: Ant Design Vue 组件
+# function_name: 功能名称（用于菜单和页面标题）
+# business_name: 业务名称
+# class_name: 实体类名
+# package_name: 包名
+# author: 作者
+#
+# === 字典配置 ===
+# dicts: 字典列表
+#   - dict_type: 字典类型
+#   - dict_name: 字典名称
+#   - sort: 排序序号

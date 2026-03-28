@@ -1,0 +1,35 @@
+dict_type: sys_mvp3_category
+dict_name: MVP3分类
+source_table: mvp3_test
+generated_at: '2026-03-23T18:02:31.650646'
+data:
+- label: 分类A
+  value: A
+  sort: 1
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 分类B
+  value: B
+  sort: 2
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 分类C
+  value: C
+  sort: 3
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 分类D
+  value: D
+  sort: 4
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 分类E
+  value: E
+  sort: 5
+  is_default: N
+  list_class: ''
+  status: '0'

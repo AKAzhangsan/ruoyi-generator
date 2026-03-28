@@ -1,0 +1,29 @@
+dict_type: sys_mvp5_tags
+dict_name: MVP5产品标签
+source_table: mvp5_full_validation
+generated_at: '2026-03-28T14:06:14.149926'
+data:
+- label: 新品
+  value: new
+  sort: 1
+  is_default: N
+  list_class: success
+  status: '0'
+- label: 热销
+  value: hot
+  sort: 2
+  is_default: N
+  list_class: danger
+  status: '0'
+- label: 促销
+  value: promotion
+  sort: 3
+  is_default: N
+  list_class: warning
+  status: '0'
+- label: 限量
+  value: limited
+  sort: 4
+  is_default: N
+  list_class: info
+  status: '0'

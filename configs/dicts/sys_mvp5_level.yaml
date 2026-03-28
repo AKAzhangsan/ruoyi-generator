@@ -1,0 +1,23 @@
+dict_type: sys_mvp5_level
+dict_name: MVP5等级
+source_table: mvp5_full_validation
+generated_at: '2026-03-28T14:06:14.152055'
+data:
+- label: 一级
+  value: '1'
+  sort: 1
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 二级
+  value: '2'
+  sort: 2
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 三级
+  value: '3'
+  sort: 3
+  is_default: N
+  list_class: ''
+  status: '0'

@@ -1,0 +1,103 @@
+package {{ packageName }}.domain;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import com.ruoyi.common.annotation.Excel;
+{% if tpl_type == "tree" %}
+import java.util.List;
+import java.util.ArrayList;
+import com.ruoyi.common.core.domain.TreeEntity;
+{% elif tpl_type == "sub" %}
+import java.util.List;
+import com.ruoyi.common.core.domain.BaseEntity;
+{% else %}
+import com.ruoyi.common.core.domain.BaseEntity;
+{% endif %}
+
+/**
+ * {{ functionName }}对象 {{ tableName }}
+ * 
+ * @author {{ author }}
+ * @date {{ datetime }}
+ */
+public class {{ ClassName }} extends {% if tpl_type == "tree" %}TreeEntity{% else %}BaseEntity{% endif %}
+{
+    private static final long serialVersionUID = 1L;
+
+{# 树表模式下，TreeEntity已有的字段不需要在Entity中生成 #}
+{% if tpl_type == "tree" %}
+{% set skip_columns = ['create_by', 'create_time', 'update_by', 'update_time', 'remark', 'parent_id', 'ancestors', 'order_num'] %}
+{% else %}
+{% set skip_columns = ['create_by', 'create_time', 'update_by', 'update_time', 'remark'] %}
+{% endif %}
+
+{% for column in columns %}
+{% if column.column_name not in skip_columns %}
+    /** {{ column.column_comment }} */
+{% if column.is_list %}
+{% if '（' in column.column_comment or '(' in column.column_comment %}
+{% set dict_exp = column.column_comment | dict_options %}
+    @Excel(name = "{{ column.column_comment.split('（')[0].split('(')[0] }}", readConverterExp = "{{ dict_exp }}")
+{% elif column.java_type == 'Date' %}
+{% if column.date_format == 'YYYY-MM-DD' or column.date_format == 'yyyy-MM-dd' %}
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @Excel(name = "{{ column.column_comment }}", width = 30, dateFormat = "yyyy-MM-dd")
+{% else %}
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Excel(name = "{{ column.column_comment }}", width = 30, dateFormat = "yyyy-MM-dd HH:mm:ss")
+{% endif %}
+{% else %}
+    @Excel(name = "{{ column.column_comment }}")
+{% endif %}
+{% endif %}
+    private {{ column.java_type }} {{ column.java_field }};
+
+{% endif %}
+{% endfor %}
+
+{% if tpl_type == "sub" and subClassName is defined %}
+    /** {{ subTableComment }}列表 */
+    private List<{{ subClassName }}> {{ subclassName }}List;
+
+{% endif %}
+{% for column in columns %}
+{% if column.column_name not in skip_columns %}
+    public void set{{ column.cap_java_field }}({{ column.java_type }} {{ column.java_field }})
+    {
+        this.{{ column.java_field }} = {{ column.java_field }};
+    }
+
+    public {{ column.java_type }} get{{ column.cap_java_field }}()
+    {
+        return {{ column.java_field }};
+    }
+
+{% endif %}
+{% endfor %}
+
+{% if tpl_type == "sub" and subClassName is defined %}
+    public List<{{ subClassName }}> get{{ subClassName }}List()
+    {
+        return {{ subclassName }}List;
+    }
+
+    public void set{{ subClassName }}List(List<{{ subClassName }}> {{ subclassName }}List)
+    {
+        this.{{ subclassName }}List = {{ subclassName }}List;
+    }
+
+{% endif %}
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+{% for column in columns %}
+{% if column.column_name not in skip_columns %}
+            .append("{{ column.java_field }}", get{{ column.cap_java_field }}())
+{% endif %}
+{% endfor %}
+            .toString();
+    }
+}

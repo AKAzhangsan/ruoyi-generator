@@ -1,0 +1,71 @@
+# 若依代码生成器配置
+
+# 数据库配置
+database:
+  host: localhost
+  port: 3306
+  database: ry_vue
+  user: ruoyi
+  password: ruoyi123
+  charset: utf8mb4
+
+# 生成器配置
+generator:
+  # 作者
+  author: "ruoyi"
+  
+  # 基础包名
+  package_name: "com.ruoyi"
+  
+  # 默认模块名（可在命令行覆盖）
+  module_name: "system"
+  
+  # 输出基础路径
+  output_path: "./output"
+  
+  # 模板路径
+  template_path: "./templates"
+  
+  # 上级菜单ID（系统工具=3）
+  parent_menu_id: "3"
+  
+  # 前端模板类型: element-plus / element-plus-typescript
+  tpl_web_type: "element-plus"
+  
+  # 是否生成菜单SQL
+  gen_menu_sql: true
+
+# 类型映射
+type_mapping:
+  # MySQL类型 -> Java类型
+  mysql_to_java:
+    bigint: "Long"
+    int: "Integer"
+    tinyint: "Integer"
+    smallint: "Integer"
+    mediumint: "Integer"
+    varchar: "String"
+    char: "String"
+    text: "String"
+    longtext: "String"
+    decimal: "BigDecimal"
+    numeric: "BigDecimal"
+    float: "Float"
+    double: "Double"
+    datetime: "Date"
+    timestamp: "Date"
+    date: "Date"
+    time: "Date"
+    blob: "byte[]"
+    longblob: "byte[]"
+    
+  # MySQL类型 -> JDBC类型（用于XML）
+  mysql_to_jdbc:
+    bigint: "BIGINT"
+    int: "INTEGER"
+    tinyint: "TINYINT"
+    varchar: "VARCHAR"
+    text: "LONGVARCHAR"
+    decimal: "DECIMAL"
+    datetime: "TIMESTAMP"
+    date: "DATE"

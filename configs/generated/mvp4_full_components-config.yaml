@@ -1,0 +1,321 @@
+table_name: mvp4_full_components
+table_comment: MVP4全组件测试表
+module: test
+business: mvp4_full_components  # ⚠️ 建议修改为唯一的业务名，如: mvp4fullcomponents
+function_name: MVP4全组件测试表
+sort: 1  # 菜单排序号
+
+columns:
+  - name: id
+    comment: 主键ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Long  # Java类型
+    component: Input  # 组件类型
+
+  - name: name
+    comment: 名称
+    type: varchar
+    length: 100
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: LIKE  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Radio  # 组件类型
+    dict_type: sys_mvp4_status  # 字典类型
+
+  - name: category
+    comment: 分类
+    type: varchar
+    length: 20
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Select  # 组件类型
+    dict_type: sys_mvp4_category  # 字典类型
+
+  - name: tags
+    comment: 标签
+    type: varchar
+    length: 200
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Checkbox  # 组件类型
+    dict_type: sys_mvp4_tags  # 字典类型
+
+  - name: level
+    comment: 等级多选
+    type: varchar
+    length: 50
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Checkbox  # 组件类型
+    dict_type: sys_mvp4_level  # 字典类型
+
+  - name: priority
+    comment: 优先级
+    type: int
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: BETWEEN  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Integer  # Java类型
+    component: InputNumber  # 组件类型
+
+  - name: score
+    comment: 评分
+    type: decimal
+    precision: 5
+    scale: 2
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: BETWEEN  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: BigDecimal  # Java类型
+    component: InputNumber  # 组件类型
+
+  - name: cover_image
+    comment: 封面图
+    type: varchar
+    length: 500
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: ImageUpload  # 组件类型
+    limit: 1  # 数量限制
+    file_size: 5  # 大小限制(MB)
+
+  - name: gallery
+    comment: 图集
+    type: varchar
+    length: 2000
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: ImageUpload  # 组件类型
+    limit: 9  # 数量限制
+    file_size: 5  # 大小限制(MB)
+
+  - name: attachment
+    comment: 附件
+    type: varchar
+    length: 500
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: FileUpload  # 组件类型
+    limit: 3  # 数量限制
+    file_size: 10  # 大小限制(MB)
+
+  - name: content
+    comment: 内容
+    type: longtext
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Editor  # 组件类型
+    height: 300  # 编辑器高度
+
+  - name: description
+    comment: 描述
+    type: text
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Textarea  # 组件类型
+
+  - name: start_date
+    comment: 开始日期
+    type: date
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: BETWEEN  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Date  # Java类型
+    component: DatePicker  # 组件类型
+    date_format: YYYY-MM-DD  # 日期格式
+
+  - name: deadline
+    comment: 截止时间
+    type: datetime
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: BETWEEN  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Date  # Java类型
+    component: DatePicker  # 组件类型
+    date_format: YYYY-MM-DD HH:mm:ss  # 日期格式
+
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: BETWEEN  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Date  # Java类型
+    component: DatePicker  # 组件类型
+    date_format: YYYY-MM-DD HH:mm:ss  # 日期格式
+
+dicts:
+  - dict_type: sys_mvp4_status
+    dict_name: MVP4状态
+    sort: 1
+    data:
+      - label: 启用
+        value: '0'
+        sort: 1
+        is_default: Y
+        list_class: success
+      - label: 禁用
+        value: '1'
+        sort: 2
+        is_default: N
+        list_class: danger
+      - label: 草稿
+        value: '2'
+        sort: 3
+        is_default: N
+        list_class: warning
+
+  - dict_type: sys_mvp4_category
+    dict_name: MVP4分类
+    sort: 2
+    data:
+      - label: 技术
+        value: 'tech'
+        sort: 1
+        is_default: N
+      - label: 产品
+        value: 'product'
+        sort: 2
+        is_default: N
+      - label: 设计
+        value: 'design'
+        sort: 3
+        is_default: N
+      - label: 运营
+        value: 'operation'
+        sort: 4
+        is_default: N
+      - label: 市场
+        value: 'marketing'
+        sort: 5
+        is_default: N
+
+  - dict_type: sys_mvp4_tags
+    dict_name: MVP4标签
+    sort: 3
+    data:
+      - label: 热门
+        value: 'hot'
+        sort: 1
+        is_default: N
+        list_class: danger
+      - label: 推荐
+        value: 'recommend'
+        sort: 2
+        is_default: N
+        list_class: success
+      - label: 精选
+        value: 'featured'
+        sort: 3
+        is_default: N
+        list_class: primary
+      - label: 最新
+        value: 'latest'
+        sort: 4
+        is_default: N
+        list_class: info
+
+  - dict_type: sys_mvp4_level
+    dict_name: MVP4等级
+    sort: 4
+    data:
+      - label: 1级
+        value: '1'
+        sort: 1
+        is_default: N
+      - label: 2级
+        value: '2'
+        sort: 2
+        is_default: N
+      - label: 3级
+        value: '3'
+        sort: 3
+        is_default: N
+      - label: 4级
+        value: '4'
+        sort: 4
+        is_default: N
+      - label: 5级
+        value: '5'
+        sort: 5
+        is_default: N

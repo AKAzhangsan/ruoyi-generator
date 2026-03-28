@@ -1,0 +1,180 @@
+table_name: test_order
+table_comment: 订单管理
+module: test
+business: test_order  # ⚠️ 建议修改为唯一的业务名，如: testorder
+function_name: 订单管理
+sort: 1  # 菜单排序号
+tpl_type: sub
+sub_table:
+  table_name: test_order_item
+  table_comment: 订单明细
+  fk_column: order_id
+  columns:
+    - name: item_id
+      comment: 明细ID
+      type: bigint
+      is_pk: true
+      is_auto_increment: true
+      java_type: Long
+      component: InputNumber
+
+    - name: order_id
+      comment: 订单ID
+      type: bigint
+      java_type: Long
+      component: InputNumber
+
+    - name: product_name
+      comment: 商品名称
+      type: varchar
+      length: 200
+      java_type: String
+      component: Input
+
+    - name: item_type
+      comment: 商品类型
+      type: char
+      length: 1
+      java_type: String
+      component: Select
+      dict_type: sys_sub_item_type
+
+    - name: quantity
+      comment: 数量
+      type: int
+      java_type: Integer
+      component: InputNumber
+
+    - name: price
+      comment: 单价
+      type: decimal
+      precision: 10
+      scale: 2
+      java_type: BigDecimal
+      component: InputNumber
+
+    - name: delivery_date
+      comment: 交付日期
+      type: date
+      java_type: Date
+      component: DatePicker
+      date_format: YYYY-MM-DD
+
+
+columns:
+  - name: order_id
+    comment: 订单ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Long  # Java类型
+    component: Input  # 组件类型
+
+  - name: order_no
+    comment: 订单编号
+    type: varchar
+    length: 64
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: customer_name
+    comment: 客户名称
+    type: varchar
+    length: 100
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: LIKE  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: total_amount
+    comment: 总金额
+    type: decimal
+    precision: 10
+    scale: 2
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: BigDecimal  # Java类型
+    component: InputNumber  # 组件类型
+
+  - name: status
+    comment: 订单状态
+    type: char
+    length: 1
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Radio  # 组件类型
+    dict_type: sys_sub_order_status  # 字典类型
+
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Date  # Java类型
+    component: DatePicker  # 组件类型
+    date_format: YYYY-MM-DD HH:mm:ss  # 日期格式
+
+dicts:
+  - dict_type: sys_sub_order_status
+    dict_name: 订单状态
+    sort: 1
+    data:
+      - label: 待付款
+        value: '0'
+        sort: 1
+        is_default: Y
+        list_class: warning
+      - label: 已付款
+        value: '1'
+        sort: 2
+        is_default: N
+        list_class: success
+      - label: 已取消
+        value: '2'
+        sort: 3
+        is_default: N
+        list_class: danger
+
+  - dict_type: sys_sub_item_type
+    dict_name: 商品类型
+    sort: 2
+    data:
+      - label: 实物商品
+        value: '1'
+        sort: 1
+        is_default: Y
+        list_class: primary
+      - label: 虚拟商品
+        value: '2'
+        sort: 2
+        is_default: N
+        list_class: info

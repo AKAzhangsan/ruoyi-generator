@@ -1,0 +1,23 @@
+dict_type: sys_sub_order_status
+dict_name: 订单状态
+source_table: test_order
+generated_at: '2026-03-28T17:31:45.844694'
+data:
+- label: 待付款
+  value: '0'
+  sort: 1
+  is_default: Y
+  list_class: warning
+  status: '0'
+- label: 已付款
+  value: '1'
+  sort: 2
+  is_default: N
+  list_class: success
+  status: '0'
+- label: 已取消
+  value: '2'
+  sort: 3
+  is_default: N
+  list_class: danger
+  status: '0'

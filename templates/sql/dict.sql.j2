@@ -1,0 +1,35 @@
+-- 字典类型: {{ dict.dict_name }} ({{ dict.dict_type }})
+-- 来源表: {{ dict.source_table }}
+-- 生成时间: {{ dict.generated_at }}
+-- 策略: {{ strategy }}
+
+{% if strategy == 'skip' %}
+-- 策略说明: 如果字典已存在则跳过（INSERT IGNORE）
+INSERT IGNORE INTO sys_dict_type (dict_name, dict_type, status, create_by, create_time, remark)
+VALUES ('{{ dict.dict_name }}', '{{ dict.dict_type }}', '0', 'admin', NOW(), '');
+{% elif strategy == 'merge' %}
+-- 策略说明: 合并数据，不删除已有数据（存在则更新）
+INSERT INTO sys_dict_type (dict_name, dict_type, status, create_by, create_time, remark)
+VALUES ('{{ dict.dict_name }}', '{{ dict.dict_type }}', '0', 'admin', NOW(), '')
+ON DUPLICATE KEY UPDATE dict_name = VALUES(dict_name), status = '0';
+{% else %}
+-- 策略说明: 完全替换（先删除再插入）
+DELETE FROM sys_dict_type WHERE dict_type = '{{ dict.dict_type }}';
+INSERT INTO sys_dict_type (dict_name, dict_type, status, create_by, create_time, remark)
+VALUES ('{{ dict.dict_name }}', '{{ dict.dict_type }}', '0', 'admin', NOW(), '');
+{% endif %}
+
+{% if strategy == 'replace' %}
+-- 清除旧数据
+DELETE FROM sys_dict_data WHERE dict_type = '{{ dict.dict_type }}';
+{% endif %}
+
+-- 字典数据项
+{% for item in dict.data %}
+{% if strategy == 'skip' %}
+INSERT IGNORE INTO sys_dict_data (dict_label, dict_value, dict_type, dict_sort, is_default, status, create_by, create_time, list_class)
+{% else %}
+INSERT INTO sys_dict_data (dict_label, dict_value, dict_type, dict_sort, is_default, status, create_by, create_time, list_class)
+{% endif %}
+VALUES ('{{ item.label }}', '{{ item.value }}', '{{ dict.dict_type }}', {{ item.sort }}, '{{ item.is_default }}', '{{ item.status }}', 'admin', NOW(), '{{ item.list_class }}');
+{% endfor %}

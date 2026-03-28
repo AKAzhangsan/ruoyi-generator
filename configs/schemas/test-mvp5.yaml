@@ -1,0 +1,313 @@
+# MVP5 全组件验证测试表
+# 目的：验证代码生成器优化后的所有组件功能
+# 包含：9种组件类型 + 系统字典复用 + 新业务字典
+
+table_name: mvp5_full_validation
+table_comment: MVP5全组件验证测试表
+module: test
+business: mvp5_full_validation
+function_name: MVP5全组件验证测试
+sort: 10
+
+# ========== 字典定义 ==========
+# 注意：优先使用系统字典，新业务字典加前缀
+dicts:
+  # 新业务字典 - 产品分类（系统没有的才创建）
+  - dict_type: sys_mvp5_product_category
+    dict_name: MVP5产品分类
+    sort: 1
+    data:
+      - label: 电子产品
+        value: electronics
+        sort: 1
+        list_class: primary
+      - label: 家居用品
+        value: home
+        sort: 2
+        list_class: success
+      - label: 服装配饰
+        value: clothing
+        sort: 3
+        list_class: warning
+      - label: 食品饮料
+        value: food
+        sort: 4
+        list_class: danger
+
+  # 新业务字典 - 标签
+  - dict_type: sys_mvp5_tags
+    dict_name: MVP5产品标签
+    sort: 2
+    data:
+      - label: 新品
+        value: new
+        sort: 1
+        list_class: success
+      - label: 热销
+        value: hot
+        sort: 2
+        list_class: danger
+      - label: 促销
+        value: promotion
+        sort: 3
+        list_class: warning
+      - label: 限量
+        value: limited
+        sort: 4
+        list_class: info
+
+  # 新业务字典 - 等级
+  - dict_type: sys_mvp5_level
+    dict_name: MVP5等级
+    sort: 3
+    data:
+      - label: 一级
+        value: '1'
+        sort: 1
+      - label: 二级
+        value: '2'
+        sort: 2
+      - label: 三级
+        value: '3'
+        sort: 3
+
+columns:
+  # ========== 主键（必须）==========
+  - name: id
+    comment: 主键ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    query_type: EQ
+    java_type: Long
+    component: Input
+
+  # ========== 基础输入组件 ==========
+  # Input - 产品名称
+  - name: product_name
+    comment: 产品名称
+    type: varchar
+    length: 100
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: LIKE
+    java_type: String
+    component: Input
+
+  # Textarea - 产品描述
+  - name: description
+    comment: 产品描述
+    type: text
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Textarea
+
+  # ========== 选择组件（使用系统字典）==========
+  # Radio - 状态（使用系统字典 sys_normal_disable）
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: EQ
+    java_type: String
+    component: Radio
+    dict_type: sys_normal_disable   # ✅ 使用系统字典，无需在dicts中定义
+
+  # Select - 产品分类（使用新业务字典）
+  - name: category
+    comment: 产品分类
+    type: varchar
+    length: 20
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: EQ
+    java_type: String
+    component: Select
+    dict_type: sys_mvp5_product_category
+
+  # ========== 多选组件 ==========
+  # Checkbox - 标签
+  - name: tags
+    comment: 产品标签
+    type: varchar
+    length: 200
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Checkbox
+    dict_type: sys_mvp5_tags
+
+  # Checkbox - 等级（数值字典）
+  - name: level
+    comment: 产品等级
+    type: varchar
+    length: 50
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Checkbox
+    dict_type: sys_mvp5_level
+
+  # ========== 数字输入组件 ==========
+  # InputNumber - 整数（范围查询）
+  - name: stock_quantity
+    comment: 库存数量
+    type: int
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: BETWEEN
+    java_type: Integer
+    component: InputNumber
+
+  # InputNumber - 小数（范围查询）
+  - name: price
+    comment: 产品价格
+    type: decimal
+    precision: 10
+    scale: 2
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: BETWEEN
+    java_type: BigDecimal
+    component: InputNumber
+
+  # ========== 上传组件 ==========
+  # ImageUpload - 单图
+  - name: main_image
+    comment: 主图
+    type: varchar
+    length: 500
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: ImageUpload
+    limit: 1
+    file_size: 5
+
+  # ImageUpload - 多图
+  - name: gallery_images
+    comment: 图集
+    type: varchar
+    length: 2000
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: ImageUpload
+    limit: 9
+    file_size: 5
+
+  # FileUpload - 附件
+  - name: attachment
+    comment: 附件
+    type: varchar
+    length: 500
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: FileUpload
+    limit: 3
+    file_size: 10
+
+  # ========== 富文本组件 ==========
+  # Editor - 富文本
+  - name: detail_content
+    comment: 详情内容
+    type: longtext
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Editor
+    height: 350
+
+  # ========== 日期组件 ==========
+  # DatePicker - 纯日期
+  - name: production_date
+    comment: 生产日期
+    type: date
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD
+
+  # DatePicker - 日期时间
+  - name: expiry_date
+    comment: 过期时间
+    type: datetime
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: false
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss
+
+  # ========== 系统字段 ==========
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false
+    is_edit: false
+    is_list: true
+    is_query: true
+    is_required: false
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss

@@ -1,0 +1,29 @@
+dict_type: sys_mvp5_product_category
+dict_name: MVP5产品分类
+source_table: mvp5_full_validation
+generated_at: '2026-03-28T14:06:14.067383'
+data:
+- label: 电子产品
+  value: electronics
+  sort: 1
+  is_default: N
+  list_class: primary
+  status: '0'
+- label: 家居用品
+  value: home
+  sort: 2
+  is_default: N
+  list_class: success
+  status: '0'
+- label: 服装配饰
+  value: clothing
+  sort: 3
+  is_default: N
+  list_class: warning
+  status: '0'
+- label: 食品饮料
+  value: food
+  sort: 4
+  is_default: N
+  list_class: danger
+  status: '0'

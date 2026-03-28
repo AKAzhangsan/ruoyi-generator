@@ -1,0 +1,330 @@
+# MVP4 全组件测试表 - 覆盖所有前端组件类型
+# 用于验证代码生成器支持的所有表单组件和查询方式
+table_name: mvp4_full_components
+table_comment: MVP4全组件测试表
+module: test
+business: mvp4_full_components
+function_name: MVP4全组件测试
+sort: 5
+
+# 字典定义
+dicts:
+  - dict_type: sys_mvp4_status
+    dict_name: MVP4状态
+    sort: 1
+    data:
+      - label: 启用
+        value: '0'
+        sort: 1
+        is_default: Y
+        list_class: success
+      - label: 禁用
+        value: '1'
+        sort: 2
+        is_default: N
+        list_class: danger
+      - label: 草稿
+        value: '2'
+        sort: 3
+        is_default: N
+        list_class: warning
+  
+  - dict_type: sys_mvp4_category
+    dict_name: MVP4分类
+    sort: 2
+    data:
+      - label: 技术
+        value: tech
+        sort: 1
+      - label: 产品
+        value: product
+        sort: 2
+      - label: 设计
+        value: design
+        sort: 3
+      - label: 运营
+        value: operation
+        sort: 4
+      - label: 市场
+        value: marketing
+        sort: 5
+  
+  - dict_type: sys_mvp4_tags
+    dict_name: MVP4标签
+    sort: 3
+    data:
+      - label: 热门
+        value: hot
+        sort: 1
+        list_class: danger
+      - label: 推荐
+        value: recommend
+        sort: 2
+        list_class: success
+      - label: 精选
+        value: featured
+        sort: 3
+        list_class: primary
+      - label: 最新
+        value: latest
+        sort: 4
+        list_class: info
+  
+  - dict_type: sys_mvp4_level
+    dict_name: MVP4等级
+    sort: 4
+    data:
+      - label: 1级
+        value: '1'
+        sort: 1
+      - label: 2级
+        value: '2'
+        sort: 2
+      - label: 3级
+        value: '3'
+        sort: 3
+      - label: 4级
+        value: '4'
+        sort: 4
+      - label: 5级
+        value: '5'
+        sort: 5
+
+  # sys_mvp4_yes_no 字典已删除 - 对应的is_urgent字段已移除
+
+columns:
+  # 主键
+  - name: id
+    comment: 主键ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: Long
+    component: Input
+
+  # 1. 基础输入组件
+  - name: name
+    comment: 名称
+    type: varchar
+    length: 100
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: LIKE
+    java_type: String
+    component: Input
+
+  # 2. Radio单选组件（字典）
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: EQ
+    java_type: String
+    component: Radio
+    dict_type: sys_mvp4_status
+
+  # 3. Select下拉组件（字典）
+  - name: category
+    comment: 分类
+    type: varchar
+    length: 20
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: EQ
+    java_type: String
+    component: Select
+    dict_type: sys_mvp4_category
+
+  # 4. Checkbox多选组件（字典）
+  - name: tags
+    comment: 标签
+    type: varchar
+    length: 200
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Checkbox
+    dict_type: sys_mvp4_tags
+
+  # 5. Checkbox多选组件（数值字典）- 改为多选框展示不同多选方式
+  - name: level
+    comment: 等级多选
+    type: varchar
+    length: 50
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Checkbox
+    dict_type: sys_mvp4_level
+
+  # 6. 删除重复的Radio布尔组件 - 已有status单选，注释掉避免重复
+
+  # 7. InputNumber整数组件（范围查询）
+  - name: priority
+    comment: 优先级
+    type: int
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: BETWEEN
+    java_type: Integer
+    component: InputNumber
+
+  # 8. InputNumber小数组件（范围查询）
+  - name: score
+    comment: 评分
+    type: decimal
+    precision: 5
+    scale: 2
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: false
+    query_type: BETWEEN
+    java_type: BigDecimal
+    component: InputNumber
+
+  # 9. ImageUpload单图组件
+  - name: cover_image
+    comment: 封面图
+    type: varchar
+    length: 500
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: ImageUpload
+    limit: 1
+    file_size: 5
+
+  # 10. ImageUpload多图组件
+  - name: gallery
+    comment: 图集
+    type: varchar
+    length: 2000
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: ImageUpload
+    limit: 9
+    file_size: 5
+
+  # 11. FileUpload文件组件
+  - name: attachment
+    comment: 附件
+    type: varchar
+    length: 500
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: FileUpload
+    limit: 3
+    file_size: 10
+
+  # 12. Editor富文本组件
+  - name: content
+    comment: 内容
+    type: longtext
+    is_insert: true
+    is_edit: true
+    is_list: false
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Editor
+    height: 300
+
+  # 13. Textarea文本域组件
+  - name: description
+    comment: 描述
+    type: text
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: false
+    is_required: false
+    query_type: EQ
+    java_type: String
+    component: Textarea
+
+  # 14. DatePicker日期组件（范围查询）
+  - name: start_date
+    comment: 开始日期
+    type: date
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: true
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD
+
+  # 15. DatePicker日期时间组件（范围查询）- 带时分秒
+  - name: deadline
+    comment: 截止时间
+    type: datetime
+    is_insert: true
+    is_edit: true
+    is_list: true
+    is_query: true
+    is_required: false
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss
+
+  # 创建时间
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false
+    is_edit: false
+    is_list: true
+    is_query: true
+    is_required: false
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss

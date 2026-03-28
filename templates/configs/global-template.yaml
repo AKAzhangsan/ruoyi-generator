@@ -1,0 +1,38 @@
+# ============================================
+# 全局配置模板 - ruoyi-generator.yaml
+# ============================================
+# 用法: 复制此文件到 configs/ruoyi-generator.yaml
+#       修改为你的实际项目路径和数据库配置
+# ============================================
+
+# ---------- 项目路径 ----------
+ruoyi_backend: /path/to/ruoyi-backend     # 若依后端项目路径
+ruoyi_frontend: /path/to/ruoyi-frontend   # 若依前端项目路径
+generator_home: /path/to/ruoyi-generator  # 代码生成器路径
+
+# ---------- 目录结构 ----------
+schema_dir: configs/schemas               # 表结构定义目录
+config_dir: configs/generated             # 生成的完整配置目录
+output_dir: output                        # 代码输出目录
+scripts_dir: scripts                      # 脚本目录
+
+# ---------- 数据库配置 ----------
+database:
+  host: localhost
+  port: 3306
+  name: ry_vue                            # 数据库名（注意用下划线不用横线）
+  user: ruoyi
+  password: ruoyi123
+  charset: utf8mb4
+
+# ---------- 生成器默认配置 ----------
+generator:
+  author: ruoyi                           # 代码注释中的作者名
+  package_name: com.ruoyi                 # 基础包名
+  parent_menu_id: 3                       # 上级菜单ID（3=系统工具）
+  tpl_web_type: element-plus              # 前端模板类型
+
+# ---------- 模块映射 ----------
+module_mapping:
+  system: ruoyi-system                    # system模块 → ruoyi-system目录
+  admin: ruoyi-admin                      # admin模块 → ruoyi-admin目录

@@ -1,0 +1,217 @@
+# ============================================
+# Schema 模板 - 表结构定义（第2步输入）
+# ============================================
+# 用法: 复制此文件到 configs/schemas/your_table.yaml
+#       然后修改为你的业务需求
+#
+# 流程: 
+#   1. python3 main_allinone.py --schema configs/schemas/your_table.yaml --step=config
+#   2. python3 main_allinone.py --schema configs/generated/your_table-config.yaml --step=generate
+# ============================================
+
+# ---------- 表基础信息 ----------
+table_name: your_table_name         # 数据库表名（下划线命名）
+table_comment: 你的业务功能          # 表注释（中文）
+module: test                         # 模块名（对应前后端目录名）
+business: your_table_name            # 业务名（用于生成类名前缀）
+function_name: 你的功能名称          # 功能名称（用于菜单和注释）
+sort: 1                              # 菜单排序号
+
+# ---------- 字典定义（可选）----------
+# 如果使用系统已有字典（如 sys_normal_disable），无需在此定义
+# 查看已有字典: ./scripts/check-dicts.sh
+dicts:
+  # 示例：自定义状态字典
+  - dict_type: sys_your_status       # 字典类型（建议加业务前缀 sys_xxx_）
+    dict_name: 业务状态               # 字典名称
+    sort: 1
+    data:
+      - label: 启用                   # 显示文本
+        value: '0'                    # 存储值
+        sort: 1
+        is_default: Y                 # 是否默认值
+        list_class: success           # 标签样式: primary/success/warning/danger/info
+      - label: 禁用
+        value: '1'
+        sort: 2
+        list_class: danger
+
+  # 示例：自定义分类字典
+  - dict_type: sys_your_category
+    dict_name: 业务分类
+    sort: 2
+    data:
+      - label: 分类A
+        value: type_a
+        sort: 1
+      - label: 分类B
+        value: type_b
+        sort: 2
+
+# ---------- 字段定义 ----------
+columns:
+  # ===== 主键（必须）=====
+  - name: id
+    comment: 主键ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    java_type: Long
+    component: Input
+
+  # ===== Input 文本输入 =====
+  - name: name
+    comment: 名称
+    type: varchar
+    length: 100
+    is_required: true               # 必填
+    query_type: LIKE                # 查询方式: EQ/LIKE/BETWEEN
+    java_type: String
+    component: Input
+
+  # ===== Textarea 文本域 =====
+  - name: description
+    comment: 描述
+    type: text
+    java_type: String
+    component: Textarea
+
+  # ===== Radio 单选（引用系统字典）=====
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    is_required: true
+    java_type: String
+    component: Radio
+    dict_type: sys_normal_disable   # 直接引用系统字典，无需在 dicts 定义
+
+  # ===== Select 下拉选择 =====
+  - name: category
+    comment: 分类
+    type: varchar
+    length: 20
+    is_required: true
+    java_type: String
+    component: Select
+    dict_type: sys_your_category    # 引用上面定义的自定义字典
+
+  # ===== Checkbox 多选 =====
+  # 注意: type 必须是 varchar，存储格式为逗号分隔字符串
+  - name: tags
+    comment: 标签
+    type: varchar
+    length: 200
+    java_type: String
+    component: Checkbox
+    dict_type: sys_your_tags
+
+  # ===== InputNumber 整数 =====
+  - name: quantity
+    comment: 数量
+    type: int
+    is_required: true
+    query_type: BETWEEN             # 支持范围查询
+    java_type: Integer
+    component: InputNumber
+
+  # ===== InputNumber 小数 =====
+  - name: price
+    comment: 价格
+    type: decimal
+    precision: 10                   # 总位数
+    scale: 2                        # 小数位数
+    query_type: BETWEEN
+    java_type: BigDecimal
+    component: InputNumber
+
+  # ===== DatePicker 日期 =====
+  - name: start_date
+    comment: 开始日期
+    type: date
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD         # 纯日期
+
+  # ===== DatePicker 日期时间 =====
+  - name: deadline
+    comment: 截止时间
+    type: datetime
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss  # 日期+时间
+
+  # ===== ImageUpload 图片上传 =====
+  - name: cover_image
+    comment: 封面图
+    type: varchar
+    length: 500
+    java_type: String
+    component: ImageUpload
+    limit: 1                        # 最多上传数量
+    file_size: 5                    # 单文件大小限制(MB)
+
+  # ===== ImageUpload 多图上传 =====
+  - name: gallery
+    comment: 图集
+    type: varchar
+    length: 2000                    # 多图需要更长的 varchar
+    java_type: String
+    component: ImageUpload
+    limit: 9
+    file_size: 5
+
+  # ===== FileUpload 文件上传 =====
+  - name: attachment
+    comment: 附件
+    type: varchar
+    length: 500
+    java_type: String
+    component: FileUpload
+    limit: 3
+    file_size: 10
+
+  # ===== Editor 富文本 =====
+  - name: content
+    comment: 详细内容
+    type: longtext
+    java_type: String
+    component: Editor
+    height: 300                     # 编辑器高度(px)
+
+  # ===== 创建时间（自动填充，不需要表单）=====
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false
+    is_edit: false
+    is_list: true
+    is_query: true
+    query_type: BETWEEN
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss
+
+# ============================================
+# 字段属性速查
+# ============================================
+# type:          bigint / int / varchar / char / text / longtext / date / datetime / decimal
+# java_type:     Long / Integer / String / Date / BigDecimal
+# component:     Input / Textarea / Radio / Select / Checkbox / InputNumber / DatePicker / ImageUpload / FileUpload / Editor
+# query_type:    EQ / NE / GT / GE / LT / LE / LIKE / BETWEEN
+# is_required:   true/false  是否必填
+# is_list:       true/false  是否在列表中显示（默认true）
+# is_query:      true/false  是否作为查询条件（默认false）
+# is_insert:     true/false  是否在新增表单中（默认true）
+# is_edit:       true/false  是否在编辑表单中（默认true）
+# dict_type:     字典类型名称（Radio/Select/Checkbox 必须指定）
+# date_format:   YYYY-MM-DD 或 YYYY-MM-DD HH:mm:ss
+# limit:         上传数量限制（ImageUpload/FileUpload 使用）
+# file_size:     文件大小限制MB（ImageUpload/FileUpload 使用）
+# height:        编辑器高度px（Editor 使用）

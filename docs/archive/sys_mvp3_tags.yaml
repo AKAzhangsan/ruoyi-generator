@@ -1,0 +1,23 @@
+dict_type: sys_mvp3_tags
+dict_name: MVP3标签
+source_table: mvp3_test
+generated_at: '2026-03-23T18:02:31.653841'
+data:
+- label: 热门
+  value: hot
+  sort: 1
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 推荐
+  value: recommend
+  sort: 2
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 新品
+  value: new
+  sort: 3
+  is_default: N
+  list_class: ''
+  status: '0'
