@@ -1,0 +1,420 @@
+<template>
+  <div class="app-container">
+    <!-- 搜索栏 -->
+    <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
+{% for column in query_columns %}
+      <el-form-item label="{{ column.column_comment.split('（')[0].split('(')[0][:4] }}" prop="{{ column.java_field }}">
+{% if column.component == 'DatePicker' %}
+{% if column.query_type == 'BETWEEN' %}
+        <el-date-picker
+          v-model="daterange{{ column.cap_java_field }}"
+          value-format="{{ column.date_format | default('YYYY-MM-DD') }}"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+{% else %}
+        <el-date-picker
+          v-model="queryParams.{{ column.java_field }}"
+          placeholder="请选择{{ column.column_comment.split('（')[0].split('(')[0] }}"
+          clearable
+          value-format="{{ column.date_format | default('YYYY-MM-DD') }}"
+          type="date"
+        ></el-date-picker>
+{% endif %}
+{% elif column.component == 'Select' or column.component == 'Radio' %}
+        <el-select v-model="queryParams.{{ column.java_field }}" placeholder="请选择{{ column.column_comment.split('（')[0].split('(')[0] }}" clearable>
+          <el-option
+            v-for="d in {{ column.dict_type }}"
+            :key="d.value"
+            :label="d.label"
+            :value="d.value"
+          />
+        </el-select>
+{% elif column.component == 'Checkbox' %}
+        <el-select v-model="queryParams.{{ column.java_field }}" placeholder="请选择{{ column.column_comment.split('（')[0].split('(')[0] }}" clearable multiple collapse-tags>
+          <el-option
+            v-for="d in {{ column.dict_type }}"
+            :key="d.value"
+            :label="d.label"
+            :value="d.value"
+          />
+        </el-select>
+{% elif column.component == 'InputNumber' %}
+{% if column.query_type == 'BETWEEN' %}
+        <el-input-number v-model="queryParams.{{ column.java_field }}Start" placeholder="最小值" :controls="false" style="width: 100px;" />
+        <span style="margin: 0 5px;">-</span>
+        <el-input-number v-model="queryParams.{{ column.java_field }}End" placeholder="最大值" :controls="false" style="width: 100px;" />
+{% else %}
+        <el-input-number v-model="queryParams.{{ column.java_field }}" placeholder="请输入{{ column.column_comment.split('（')[0].split('(')[0] }}" :controls="false" />
+{% endif %}
+{% else %}
+        <el-input
+          v-model="queryParams.{{ column.java_field }}"
+          placeholder="请输入{{ column.column_comment.split('（')[0].split('(')[0] }}"
+          clearable
+          @keyup.enter="handleQuery"
+        />
+{% endif %}
+      </el-form-item>
+{% endfor %}
+      <el-form-item>
+        <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
+        <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+      </el-form-item>
+    </el-form>
+
+    <!-- 操作按钮 -->
+    <el-row :gutter="10" class="mb8">
+      <el-col :span="1.5">
+        <el-button
+          type="primary"
+          plain
+          icon="Plus"
+          @click="handleAdd"
+          v-hasPermi="['{{ permissionPrefix }}:add']"
+        >新增</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="success"
+          plain
+          icon="Edit"
+          :disabled="single"
+          @click="handleUpdate"
+          v-hasPermi="['{{ permissionPrefix }}:edit']"
+        >修改</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="danger"
+          plain
+          icon="Delete"
+          :disabled="multiple"
+          @click="handleDelete"
+          v-hasPermi="['{{ permissionPrefix }}:remove']"
+        >删除</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
+          type="warning"
+          plain
+          icon="Download"
+          @click="handleExport"
+          v-hasPermi="['{{ permissionPrefix }}:export']"
+        >导出</el-button>
+      </el-col>
+      <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
+    </el-row>
+
+    <!-- 数据表格 -->
+    <el-table v-loading="loading" :data="{{ businessName }}List" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" width="55" align="center" />
+{% for column in list_columns %}
+{% if column.column_name not in ['remark'] %}
+      <el-table-column label="{{ column.column_comment.split('（')[0].split('(')[0] }}" align="center" prop="{{ column.java_field }}"{% if column.column_name in ['customer_name', 'address', 'email'] %} :show-overflow-tooltip="true"{% endif %}{% if column.component == 'DatePicker' %} width="180"{% endif %}>
+{% if column.component == 'Select' or column.component == 'Radio' %}
+        <template #default="scope">
+          <dict-tag :options="{{ column.dict_type }}" :value="scope.row.{{ column.java_field }}" />
+        </template>
+{% elif column.component == 'Checkbox' %}
+        <template #default="scope">
+          <dict-tag :options="{{ column.dict_type }}" :value="scope.row.{{ column.java_field }}" separator="," />
+        </template>
+{% elif column.component == 'DatePicker' %}
+        <template #default="scope">
+{% if column.date_format and 'HH' in column.date_format %}
+          <span>{% raw %}{{ parseTime(scope.row.{% endraw %}{{ column.java_field }}{% raw %}, '{y}-{m}-{d} {h}:{i}:{s}') }}{% endraw %}</span>
+{% else %}
+          <span>{% raw %}{{ parseTime(scope.row.{% endraw %}{{ column.java_field }}{% raw %}, '{y}-{m}-{d}') }}{% endraw %}</span>
+{% endif %}
+        </template>
+{% endif %}
+      </el-table-column>
+{% endif %}
+{% endfor %}
+{% if 'remark' in list_columns|map(attribute='column_name')|list %}
+      <el-table-column label="备注" align="center" prop="remark" :show-overflow-tooltip="true" />
+{% endif %}
+      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+        <template #default="scope">
+          <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['{{ permissionPrefix }}:edit']">修改</el-button>
+          <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)" v-hasPermi="['{{ permissionPrefix }}:remove']">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <pagination
+      v-show="total > 0"
+      :total="total"
+      v-model:page="queryParams.pageNum"
+      v-model:limit="queryParams.pageSize"
+      @pagination="getList"
+    />
+
+    <!-- 添加或修改对话框 -->
+    <el-dialog :title="title" v-model="open" width="500px" append-to-body>
+      <el-form ref="{{ businessName }}Ref" :model="form" :rules="rules" label-width="80px">
+{% for column in edit_columns %}
+{% if column.column_name not in ['create_by', 'create_time', 'update_by', 'update_time'] %}
+        <el-form-item label="{{ column.column_comment.split('（')[0].split('(')[0] }}" prop="{{ column.java_field }}">
+{% if column.component == 'DatePicker' %}
+          <el-date-picker clearable
+            v-model="form.{{ column.java_field }}"
+            type="{% if column.date_format and 'HH' in column.date_format %}datetime{% else %}date{% endif %}"
+            {% if column.date_format and 'HH' in column.date_format %}
+            format="YYYY-MM-DD HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            {% else %}
+            value-format="YYYY-MM-DD"
+            {% endif %}
+            placeholder="请选择{{ column.column_comment.split('（')[0].split('(')[0] }}">
+          </el-date-picker>
+{% elif column.component == 'Textarea' %}
+          <el-input v-model="form.{{ column.java_field }}" type="textarea" placeholder="请输入{{ column.column_comment.split('（')[0].split('(')[0] }}" />
+{% elif column.component == 'Select' %}
+          <el-select v-model="form.{{ column.java_field }}" placeholder="请选择{{ column.column_comment.split('（')[0].split('(')[0] }}">
+            <el-option
+              v-for="d in {{ column.dict_type }}"
+              :key="d.value"
+              :label="d.label"
+              :value="d.value"
+            />
+          </el-select>
+{% elif column.component == 'Radio' %}
+          <el-radio-group v-model="form.{{ column.java_field }}">
+            <el-radio
+              v-for="d in {{ column.dict_type }}"
+              :key="d.value"
+              :label="d.value"
+            >{{ '{{' }} d.label {{ '}}' }}</el-radio>
+          </el-radio-group>
+{% elif column.component == 'Checkbox' %}
+          <el-checkbox-group v-model="form.{{ column.java_field }}">
+            <el-checkbox
+              v-for="d in {{ column.dict_type }}"
+              :key="d.value"
+              :label="d.value"
+            >{{ '{{' }} d.label {{ '}}' }}</el-checkbox>
+          </el-checkbox-group>
+{% elif column.component == 'ImageUpload' %}
+          <ImageUpload v-model="form.{{ column.java_field }}" {% if column.limit %}:limit="{{ column.limit }}"{% endif %} {% if column.file_size %}:fileSize="{{ column.file_size }}"{% endif %}/>
+{% elif column.component == 'FileUpload' %}
+          <FileUpload v-model="form.{{ column.java_field }}" {% if column.limit %}:limit="{{ column.limit }}"{% endif %} {% if column.file_size %}:fileSize="{{ column.file_size }}"{% endif %}/>
+{% elif column.component == 'Editor' %}
+          <Editor v-model="form.{{ column.java_field }}" {% if column.height %}:height="{{ column.height }}"{% endif %}/>
+{% elif column.component == 'InputNumber' %}
+          <el-input-number v-model="form.{{ column.java_field }}" :precision="{{ column.numeric_scale | default(0) }}" placeholder="请输入{{ column.column_comment.split('（')[0].split('(')[0] }}" />
+{% else %}
+          <el-input v-model="form.{{ column.java_field }}" placeholder="请输入{{ column.column_comment.split('（')[0].split('(')[0] }}" />
+{% endif %}
+        </el-form-item>
+{% endif %}
+{% endfor %}
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button type="primary" @click="submitForm">确 定</el-button>
+          <el-button @click="cancel">取 消</el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+
+<script setup name="{{ BusinessName }}">
+import { list{{ BusinessName }}, get{{ BusinessName }}, del{{ BusinessName }}, add{{ BusinessName }}, update{{ BusinessName }} } from "@/api/{{ moduleName }}/{{ businessName }}";
+{% set has_dict = list_columns | selectattr('dict_type') | list | length > 0 %}
+{% if has_dict %}
+import { useDict } from "@/utils/dict";
+{% endif %}
+
+const { proxy } = getCurrentInstance();
+
+const {{ businessName }}List = ref([]);
+const open = ref(false);
+const loading = ref(true);
+const showSearch = ref(true);
+const ids = ref([]);
+const single = ref(true);
+const multiple = ref(true);
+const total = ref(0);
+const title = ref("");
+
+{% for column in query_columns %}
+{% if column.component == 'DatePicker' and column.query_type == 'BETWEEN' %}
+const daterange{{ column.cap_java_field }} = ref([]);
+{% endif %}
+{% endfor %}
+
+const data = reactive({
+  form: {},
+  queryParams: {
+    pageNum: 1,
+    pageSize: 10,
+{% for column in query_columns %}
+{% if column.component == 'InputNumber' and column.query_type == 'BETWEEN' %}
+    {{ column.java_field }}Start: null,
+    {{ column.java_field }}End: null,
+{% else %}
+    {{ column.java_field }}: null,
+{% endif %}
+{% endfor %}
+  },
+  rules: {
+{% for column in edit_columns %}
+{% if column.is_required %}
+    {{ column.java_field }}: [{ required: true, message: "{{ column.column_comment.split('（')[0].split('(')[0] }}不能为空", trigger: "{% if column.component == 'Select' or column.component == 'Radio' or column.component == 'Checkbox' or column.component == 'DatePicker' %}change{% else %}blur{% endif %}" }],
+{% endif %}
+{% endfor %}
+  }
+});
+
+const { queryParams, form, rules } = toRefs(data);
+
+{% set dict_columns = list_columns | selectattr('dict_type') | list %}
+{% if dict_columns %}
+// 字典加载
+const { {% for column in dict_columns %}{{ column.dict_type }}{% if not loop.last %}, {% endif %}{% endfor %} } = useDict({% for column in dict_columns %}"{{ column.dict_type }}"{% if not loop.last %}, {% endif %}{% endfor %});
+{% endif %}
+
+/** 查询{{ functionName }}列表 */
+function getList() {
+  loading.value = true;
+  queryParams.value.params = {};{% for column in query_columns %}{% if column.component == 'DatePicker' and column.query_type == 'BETWEEN' %}
+  if (daterange{{ column.cap_java_field }}.value && daterange{{ column.cap_java_field }}.value.length > 0) {
+    queryParams.value.params['begin{{ column.cap_java_field }}'] = daterange{{ column.cap_java_field }}.value[0];
+    queryParams.value.params['end{{ column.cap_java_field }}'] = daterange{{ column.cap_java_field }}.value[1];
+  }{% endif %}{% endfor %}
+  list{{ BusinessName }}(queryParams.value).then(response => {
+    {{ businessName }}List.value = response.rows;
+    total.value = response.total;
+    loading.value = false;
+  });
+}
+
+// 取消按钮
+function cancel() {
+  open.value = false;
+  reset();
+}
+
+// 表单重置
+function reset() {
+  form.value = {
+{% for column in columns %}
+{% if column.component == 'Checkbox' %}
+    {{ column.java_field }}: [],
+{% elif column.component in ['ImageUpload', 'FileUpload', 'Editor', 'Textarea'] %}
+    {{ column.java_field }}: '',
+{% else %}
+    {{ column.java_field }}: null,
+{% endif %}
+{% endfor %}
+  };
+  proxy.resetForm("{{ businessName }}Ref");
+}
+
+/** 搜索按钮操作 */
+function handleQuery() {
+  queryParams.value.pageNum = 1;
+  getList();
+}
+
+/** 重置按钮操作 */
+function resetQuery() {
+{% for column in query_columns %}
+{% if column.component == 'DatePicker' and column.query_type == 'BETWEEN' %}
+  daterange{{ column.cap_java_field }}.value = [];
+{% endif %}
+{% endfor %}
+  proxy.resetForm("queryRef");
+  handleQuery();
+}
+
+// 多选框选中数据
+function handleSelectionChange(selection) {
+  ids.value = selection.map(item => item.{{ pkColumn.java_field }});
+  single.value = selection.length != 1;
+  multiple.value = !selection.length;
+}
+
+/** 新增按钮操作 */
+function handleAdd() {
+  reset();
+  open.value = true;
+  title.value = "添加{{ functionName }}";
+}
+
+/** 修改按钮操作 */
+function handleUpdate(row) {
+  reset();
+  const {{ pkColumn.java_field }} = row.{{ pkColumn.java_field }} || ids.value;
+  get{{ BusinessName }}({{ pkColumn.java_field }}).then(response => {
+    form.value = response.data;
+{% for column in edit_columns %}
+{% if column.component == 'Checkbox' %}
+    // {{ column.column_comment }} Checkbox数据转换
+    form.value.{{ column.java_field }} = form.value.{{ column.java_field }} ? form.value.{{ column.java_field }}.split(",") : [];
+{% endif %}
+{% endfor %}
+    open.value = true;
+    title.value = "修改{{ functionName }}";
+  });
+}
+
+/** 提交按钮 */
+function submitForm() {
+  proxy.$refs["{{ businessName }}Ref"].validate(valid => {
+    if (valid) {
+{% set checkbox_columns = edit_columns | selectattr('component', 'equalto', 'Checkbox') | list %}
+{% set has_checkbox = checkbox_columns | length > 0 %}
+{% if has_checkbox %}
+      // Checkbox数据转换：数组转字符串
+      const data = { ...form.value };
+{% for column in checkbox_columns %}
+      if (data.{{ column.java_field }} && Array.isArray(data.{{ column.java_field }})) {
+        data.{{ column.java_field }} = data.{{ column.java_field }}.join(',');
+      }
+{% endfor %}
+{% else %}
+      const data = form.value;
+{% endif %}
+      if (data.{{ pkColumn.java_field }} != null) {
+        update{{ BusinessName }}(data).then(response => {
+          proxy.$modal.msgSuccess("修改成功");
+          open.value = false;
+          getList();
+        });
+      } else {
+        add{{ BusinessName }}(data).then(response => {
+          proxy.$modal.msgSuccess("新增成功");
+          open.value = false;
+          getList();
+        });
+      }
+    }
+  });
+}
+
+/** 删除按钮操作 */
+function handleDelete(row) {
+  const deleteIds = row.{{ pkColumn.java_field }} || ids.value;
+  proxy.$modal.confirm('是否确认删除{{ functionName }}编号为"' + deleteIds + '"的数据项？').then(function() {
+    return del{{ BusinessName }}(deleteIds);
+  }).then(() => {
+    getList();
+    proxy.$modal.msgSuccess("删除成功");
+  }).catch(() => {});
+}
+
+/** 导出按钮操作 */
+function handleExport() {
+  proxy.download("{{ moduleName }}/{{ businessName }}/export", {
+    ...queryParams.value
+  }, `{{ businessName }}_${new Date().getTime()}.xlsx`);
+}
+
+getList();
+</script>

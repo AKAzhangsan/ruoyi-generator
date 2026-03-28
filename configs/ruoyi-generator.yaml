@@ -1,0 +1,70 @@
+# RuoYi Generator 全局配置文件
+# 所有脚本共享此配置，便于统一管理
+
+# ============================================
+# 项目路径配置
+# ============================================
+
+# 若依后端项目路径
+ruoyi_backend: /home/pei16/.openclaw/workspace/projects/ruoyi/ruoyi-backend
+
+# 若依前端项目路径  
+ruoyi_frontend: /home/pei16/.openclaw/workspace/projects/ruoyi/ruoyi-frontend
+
+# 代码生成器项目路径
+generator_home: /home/pei16/.openclaw/workspace/projects/ruoyi-generator
+
+# ============================================
+# 目录结构配置
+# ============================================
+
+# 表结构定义目录（用户编写）
+schema_dir: configs/schemas
+
+# 生成的完整配置目录
+config_dir: configs/generated
+
+# 代码输出目录
+output_dir: output
+
+# 脚本目录
+scripts_dir: scripts
+
+# ============================================
+# 数据库配置
+# ============================================
+
+database:
+  host: localhost
+  port: 3306
+  # 数据库名
+  name: ry_vue
+  # 账号
+  user: ruoyi
+  # 密码
+  password: ruoyi123
+  charset: utf8mb4
+
+# ============================================
+# 生成器默认配置
+# ============================================
+
+generator:
+  # 作者
+  author: ruoyi
+  # 基础包名
+  package_name: com.ruoyi
+  # 上级菜单ID（系统工具=3）
+  parent_menu_id: 3
+  # 默认前端模板
+  tpl_web_type: element-plus
+
+# ============================================
+# 模块映射（可选，用于特殊路径）
+# ============================================
+
+# 模块名 -> 实际路径映射
+# 例如: system -> ruoyi-system
+module_mapping:
+  system: ruoyi-system
+  admin: ruoyi-admin

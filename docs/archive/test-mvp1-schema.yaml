@@ -1,0 +1,63 @@
+# MVP1 测试表结构
+# 注意：business 名称已改为 mvp1_test，避免与 product_info 等表的 info 冲突
+tables:
+  - table_name: mvp1_test
+    table_comment: MVP1功能测试表
+    module: test
+    # 不指定 business，让系统自动推断为 mvp1_test
+    # 或手动指定唯一名称如: business: mvp1
+    
+    columns:
+      # 主键
+      - name: id
+        comment: 主键ID
+        type: bigint
+        is_pk: true
+        is_auto_increment: true
+        
+      # 普通文本（默认可查询 LIKE）
+      - name: name
+        comment: 名称
+        type: varchar
+        length: 100
+        
+      # 多行文本（Textarea）
+      - name: description
+        comment: 描述
+        type: text
+        
+      # 日期（DatePicker）
+      - name: create_date
+        comment: 创建日期
+        type: date
+        
+      # 日期时间（DatePicker）
+      - name: update_time
+        comment: 更新时间
+        type: datetime
+        
+      # 金额（BigDecimal）
+      - name: price
+        comment: 价格
+        type: decimal
+        precision: 10
+        scale: 2
+        
+      # 状态（字符型，后续配置Select）
+      - name: status
+        comment: 状态
+        type: char
+        length: 1
+        default: '0'
+        
+      # 系统字段
+      - name: create_by
+        comment: 创建者
+        type: varchar
+        length: 64
+        default: ''
+        
+      - name: remark
+        comment: 备注
+        type: varchar
+        length: 500

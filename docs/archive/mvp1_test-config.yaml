@@ -1,0 +1,127 @@
+table_name: mvp1_test
+table_comment: MVP1功能测试表
+module: test
+business: mvp1_test  # ⚠️ 建议修改为唯一的业务名，如: mvp1test
+function_name: MVP1功能测试表
+sort: 1  # 菜单排序号
+
+columns:
+  - name: id
+    comment: 主键ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: true  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/LIKE
+    java_type: Long  # Java类型
+    component: Input  # 组件类型
+
+  - name: name
+    comment: 名称
+    type: varchar
+    length: 100
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: LIKE  # 查询方式: EQ/LIKE
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: description
+    comment: 描述
+    type: text
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/LIKE
+    java_type: String  # Java类型
+    component: Textarea  # 组件类型
+
+  - name: create_date
+    comment: 创建日期
+    type: date
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/LIKE
+    java_type: Date  # Java类型
+    component: DatePicker  # 组件类型
+    date_format: YYYY-MM-DD  # 日期格式
+
+  - name: update_time
+    comment: 更新时间
+    type: datetime
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/LIKE
+    java_type: Date  # Java类型
+    component: DatePicker  # 组件类型
+    date_format: YYYY-MM-DD HH:mm:ss  # 日期格式
+
+  - name: price
+    comment: 价格
+    type: decimal
+    precision: 10
+    scale: 2
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/LIKE
+    java_type: BigDecimal  # Java类型
+    component: Input  # 组件类型
+
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    default: '0'
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: LIKE  # 查询方式: EQ/LIKE
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: create_by
+    comment: 创建者
+    type: varchar
+    length: 64
+    default: ''
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: LIKE  # 查询方式: EQ/LIKE
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: remark
+    comment: 备注
+    type: varchar
+    length: 500
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: true  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: LIKE  # 查询方式: EQ/LIKE
+    java_type: String  # Java类型
+    component: Input  # 组件类型

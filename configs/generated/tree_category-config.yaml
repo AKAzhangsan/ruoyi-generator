@@ -1,0 +1,103 @@
+table_name: tree_category
+table_comment: 分类管理
+module: test
+business: tree_category  # ⚠️ 建议修改为唯一的业务名，如: treecategory
+function_name: 分类管理
+sort: 1  # 菜单排序号
+tpl_type: tree
+tree_config:
+  tree_code: id
+  tree_parent_code: parent_id
+  tree_name: category_name
+
+columns:
+  - name: id
+    comment: 分类ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Long  # Java类型
+    component: Input  # 组件类型
+
+  - name: parent_id
+    comment: 父分类ID
+    type: bigint
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Long  # Java类型
+    component: Input  # 组件类型
+
+  - name: ancestors
+    comment: 祖级列表
+    type: varchar
+    length: 500
+    is_insert: false  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: false  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: category_name
+    comment: 分类名称
+    type: varchar
+    length: 100
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: LIKE  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Input  # 组件类型
+
+  - name: order_num
+    comment: 显示排序
+    type: int
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: true  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Integer  # Java类型
+    component: InputNumber  # 组件类型
+
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    is_insert: true  # 是否插入字段
+    is_edit: true  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: String  # Java类型
+    component: Radio  # 组件类型
+    dict_type: sys_normal_disable  # 字典类型
+
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false  # 是否插入字段
+    is_edit: false  # 是否编辑字段
+    is_list: true  # 是否列表显示
+    is_query: false  # 是否查询条件
+    is_required: false  # 是否必填
+    query_type: EQ  # 查询方式: EQ/NE/GT/GE/LT/LE/LIKE/BETWEEN
+    java_type: Date  # Java类型
+    component: DatePicker  # 组件类型
+    date_format: YYYY-MM-DD HH:mm:ss  # 日期格式

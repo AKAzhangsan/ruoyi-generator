@@ -1,0 +1,81 @@
+# 树表测试 - 分类管理
+# 用于验证树表代码生成功能
+
+table_name: tree_category
+table_comment: 分类管理
+module: test
+business: tree_category
+function_name: 分类管理
+sort: 2
+tpl_type: tree
+
+tree_config:
+  tree_code: id
+  tree_parent_code: parent_id
+  tree_name: category_name
+
+columns:
+  - name: id
+    comment: 分类ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    java_type: Long
+    component: Input
+
+  - name: parent_id
+    comment: 父分类ID
+    type: bigint
+    is_required: true
+    java_type: Long
+    component: Input
+
+  - name: ancestors
+    comment: 祖级列表
+    type: varchar
+    length: 500
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    java_type: String
+    component: Input
+
+  - name: category_name
+    comment: 分类名称
+    type: varchar
+    length: 100
+    is_required: true
+    query_type: LIKE
+    java_type: String
+    component: Input
+
+  - name: order_num
+    comment: 显示排序
+    type: int
+    is_required: true
+    java_type: Integer
+    component: InputNumber
+
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    java_type: String
+    component: Radio
+    dict_type: sys_normal_disable
+
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false
+    is_edit: false
+    is_list: true
+    is_query: false
+    java_type: Date
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss

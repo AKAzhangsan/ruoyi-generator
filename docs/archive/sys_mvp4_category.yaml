@@ -1,0 +1,35 @@
+dict_type: sys_mvp4_category
+dict_name: MVP4分类
+source_table: mvp4_full_components
+generated_at: '2026-03-26T18:53:37.063694'
+data:
+- label: 技术
+  value: tech
+  sort: 1
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 产品
+  value: product
+  sort: 2
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 设计
+  value: design
+  sort: 3
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 运营
+  value: operation
+  sort: 4
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 市场
+  value: marketing
+  sort: 5
+  is_default: N
+  list_class: ''
+  status: '0'

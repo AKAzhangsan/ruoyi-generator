@@ -1,0 +1,23 @@
+dict_type: sys_mvp4_status
+dict_name: MVP4状态
+source_table: mvp4_full_components
+generated_at: '2026-03-26T18:53:37.054444'
+data:
+- label: 启用
+  value: '0'
+  sort: 1
+  is_default: Y
+  list_class: success
+  status: '0'
+- label: 禁用
+  value: '1'
+  sort: 2
+  is_default: N
+  list_class: danger
+  status: '0'
+- label: 草稿
+  value: '2'
+  sort: 3
+  is_default: N
+  list_class: warning
+  status: '0'

@@ -1,0 +1,171 @@
+# MVP3 测试表 - 测试字典、选择组件和上传功能
+table_name: mvp3_test
+table_comment: MVP3字典组件测试表
+module: test
+business: mvp3_test
+function_name: MVP3字典组件测试
+sort: 4
+
+# 字典定义
+dicts:
+  - dict_type: sys_mvp3_status
+    dict_name: MVP3状态
+    sort: 1
+    data:
+      - label: 启用
+        value: '0'
+        sort: 1
+        is_default: Y
+        list_class: success
+      - label: 禁用
+        value: '1'
+        sort: 2
+        is_default: N
+        list_class: danger
+      - label: 待审核
+        value: '2'
+        sort: 3
+        is_default: N
+        list_class: warning
+  - dict_type: sys_mvp3_category
+    dict_name: MVP3分类
+    sort: 2
+    data:
+      - label: 分类A
+        value: 'A'
+        sort: 1
+      - label: 分类B
+        value: 'B'
+        sort: 2
+      - label: 分类C
+        value: 'C'
+        sort: 3
+      - label: 分类D
+        value: 'D'
+        sort: 4
+      - label: 分类E
+        value: 'E'
+        sort: 5
+  - dict_type: sys_mvp3_tags
+    dict_name: MVP3标签
+    sort: 3
+    data:
+      - label: 热门
+        value: 'hot'
+        sort: 1
+      - label: 推荐
+        value: 'recommend'
+        sort: 2
+      - label: 新品
+        value: 'new'
+        sort: 3
+
+columns:
+  # 主键
+  - name: id
+    comment: 主键ID
+    type: bigint
+    is_pk: true
+    is_auto_increment: true
+    is_insert: false
+    is_edit: false
+    is_list: false
+    is_query: false
+    is_required: false
+    
+  # 名称
+  - name: name
+    comment: 名称
+    type: varchar
+    length: 100
+    is_required: true
+    is_query: true
+    query_type: LIKE
+    
+  # Radio 组件（单选）- 3个选项，应自动推断为 Radio
+  - name: status
+    comment: 状态
+    type: char
+    length: 1
+    component: Radio
+    dict_type: sys_mvp3_status
+    is_required: true
+    
+  # Select 组件（下拉）- 5个选项
+  - name: category
+    comment: 分类
+    type: varchar
+    length: 10
+    component: Select
+    dict_type: sys_mvp3_category
+    is_required: true
+    is_query: true
+    
+  # Checkbox 组件（多选）
+  - name: tags
+    comment: 标签
+    type: varchar
+    length: 200
+    component: Checkbox
+    dict_type: sys_mvp3_tags
+    is_query: false
+    
+  # 单图上传
+  - name: cover_image
+    comment: 封面图
+    type: varchar
+    length: 500
+    component: ImageUpload
+    limit: 1
+    file_size: 5
+    is_list: false
+    
+  # 多图上传
+  - name: gallery
+    comment: 图集
+    type: varchar
+    length: 2000
+    component: ImageUpload
+    limit: 9
+    file_size: 5
+    is_list: false
+    
+  # 文件上传
+  - name: attachment
+    comment: 附件
+    type: varchar
+    length: 500
+    component: FileUpload
+    limit: 3
+    file_size: 10
+    is_list: false
+    
+  # 富文本编辑器
+  - name: content
+    comment: 内容
+    type: longtext
+    component: Editor
+    height: 300
+    is_list: false
+    is_query: false
+    
+  # 备注
+  - name: remark
+    comment: 备注
+    type: varchar
+    length: 500
+    component: Textarea
+    is_list: true
+    is_query: false
+    
+  # 创建时间
+  - name: create_time
+    comment: 创建时间
+    type: datetime
+    is_insert: false
+    is_edit: false
+    is_list: true
+    is_query: true
+    query_type: BETWEEN
+    component: DatePicker
+    date_format: YYYY-MM-DD HH:mm:ss

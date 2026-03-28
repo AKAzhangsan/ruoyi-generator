@@ -1,0 +1,29 @@
+dict_type: sys_mvp4_tags
+dict_name: MVP4标签
+source_table: mvp4_full_components
+generated_at: '2026-03-26T18:53:37.065685'
+data:
+- label: 热门
+  value: hot
+  sort: 1
+  is_default: N
+  list_class: danger
+  status: '0'
+- label: 推荐
+  value: recommend
+  sort: 2
+  is_default: N
+  list_class: success
+  status: '0'
+- label: 精选
+  value: featured
+  sort: 3
+  is_default: N
+  list_class: primary
+  status: '0'
+- label: 最新
+  value: latest
+  sort: 4
+  is_default: N
+  list_class: info
+  status: '0'

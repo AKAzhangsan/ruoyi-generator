@@ -1,0 +1,35 @@
+dict_type: sys_mvp4_level
+dict_name: MVP4等级
+source_table: mvp4_full_components
+generated_at: '2026-03-26T18:53:37.067649'
+data:
+- label: 1级
+  value: '1'
+  sort: 1
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 2级
+  value: '2'
+  sort: 2
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 3级
+  value: '3'
+  sort: 3
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 4级
+  value: '4'
+  sort: 4
+  is_default: N
+  list_class: ''
+  status: '0'
+- label: 5级
+  value: '5'
+  sort: 5
+  is_default: N
+  list_class: ''
+  status: '0'

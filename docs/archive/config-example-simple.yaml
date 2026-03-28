@@ -1,0 +1,258 @@
+# =============================================================================
+# 若依代码生成器 - 简化版YAML配置示例
+# 图书管理系统 - 图书信息表
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 【基本信息】
+# -----------------------------------------------------------------------------
+table_name: book_info              # 数据库表名（建议小写下划线）
+table_comment: 图书信息表           # 表的中文注释（显示在界面上）
+module: library                    # 模块名（决定URL路径和代码位置）
+business: book                     # 业务名（决定前端页面路径）
+function_name: 图书管理             # 功能名称（显示在菜单上）
+
+# -----------------------------------------------------------------------------
+# 【生成配置】
+# -----------------------------------------------------------------------------
+package_name: com.ruoyi.library    # Java包路径（控制器的包路径）
+parent_menu_id: 3                  # 上级菜单ID（3=系统工具，1=首页）
+# parent_menu_name: 系统管理       # 或按菜单名称指定（优先级低于ID）
+
+# 生成模板类型
+tpl_category: crud                 # crud=单表(增删改查)
+                                   # tree=树表(部门管理)
+                                   # sub=主子表(订单+明细)
+
+# 前端模板类型
+tpl_web_type: element-plus         # element-plus = Vue3标准模板
+                                   # element-plus-ts = Vue3+TypeScript
+
+# -----------------------------------------------------------------------------
+# 【自定义字典】（系统没有的字典会自动创建）
+# -----------------------------------------------------------------------------
+dicts:
+  # 字典1：图书分类
+  - dict_type: book_category       # 字典编码（唯一标识）
+    dict_name: 图书分类             # 字典名称（显示名称）
+    dict_data:                     # 字典项列表
+      - label: 计算机               # 显示文本
+        value: computer            # 存储值
+        sort: 1                    # 排序
+      - label: 文学
+        value: literature
+        sort: 2
+      - label: 历史
+        value: history
+        sort: 3
+      - label: 科技
+        value: technology
+        sort: 4
+        
+  # 字典2：图书状态
+  - dict_type: book_status
+    dict_name: 图书状态
+    dict_data:
+      - label: 可借
+        value: '0'                 # 注意：char类型用字符串
+        sort: 1
+      - label: 借出
+        value: '1'
+        sort: 2
+      - label: 维护中
+        value: '2'
+        sort: 3
+
+# -----------------------------------------------------------------------------
+# 【字段列表】
+# 格式：- 字段名: 数据类型 [必填] [查询方式] [组件类型] [额外配置]
+# -----------------------------------------------------------------------------
+fields:
+  # =========================================================================
+  # 主键字段（自动生成，一般不需要配置）
+  # =========================================================================
+  - book_id: bigint                # 数据类型
+      primary_key: true            # 是否主键
+      auto_increment: true         # 是否自增
+      comment: 图书ID              # 字段注释
+
+  # =========================================================================
+  # 基础字段示例
+  # =========================================================================
+  
+  # 字段1：图书编号
+  # 特性：必填、唯一、支持精确查询
+  - book_code: varchar(64)         # 字符串类型，长度64
+      required: true               # * 必填（数据库NOT NULL）
+      unique: true                 # 唯一约束
+      query: EQ                    # 支持查询，EQ=精确匹配
+      list: true                   # 在列表页显示
+      component: input             # 组件：文本输入框
+      comment: 图书编号            # 字段说明
+
+  # 字段2：图书名称
+  # 特性：必填、模糊查询
+  - book_name: varchar(200)
+      required: true
+      query: LIKE                  # LIKE=模糊查询（like '%值%'）
+      list: true
+      component: input
+      comment: 图书名称
+
+  # 字段3：图书分类
+  # 特性：必填、下拉选择、使用自定义字典
+  - category: varchar(50)
+      required: true
+      query: EQ
+      list: true
+      component: select            # 下拉选择框
+      dict_type: book_category     # 使用上面定义的自定义字典
+      comment: 图书分类
+
+  # 字段4：作者
+  # 特性：普通文本，不参与查询
+  - author: varchar(100)
+      query: none                  # none=不参与查询
+      list: true
+      component: input
+      comment: 作者
+
+  # 字段5：出版社
+  - publisher: varchar(200)
+      query: none
+      list: true
+      component: input
+      comment: 出版社
+
+  # 字段6：价格
+  # 特性：数字类型、范围校验
+  - price: decimal(10,2)           # 小数类型，总长度10，小数位2
+      required: true
+      list: true
+      component: number            # 数字输入框
+      validation:                  # 表单校验规则
+        min: 0                     # 最小值
+        max: 99999                 # 最大值
+      comment: 价格
+
+  # 字段7：出版日期
+  # 特性：日期选择器
+  - publish_date: date             # 日期类型（yyyy-MM-dd）
+      list: true
+      component: date-picker       # 日期选择组件
+      format: yyyy-MM-dd          # 日期格式
+      comment: 出版日期
+
+  # 字段8：图书状态
+  # 特性：单选按钮、使用自定义字典
+  - status: char(1)                # 单字符类型
+      required: true
+      default: '0'                 # 默认值
+      list: true
+      component: radio             # 单选按钮组
+      dict_type: book_status       # 使用自定义字典
+      comment: 图书状态
+
+  # 字段9：库存数量
+  # 特性：整数、数字输入
+  - stock: int                     # 整数类型
+      default: 0                   # 默认值为0
+      list: true
+      component: number
+      validation:
+        min: 0
+        max: 9999
+      comment: 库存数量
+
+  # 字段10：图书简介
+  # 特性：大文本、文本域、列表不显示
+  - description: text              # 大文本类型
+      query: none
+      list: false                  # false=列表页不显示（只在详情/编辑显示）
+      component: textarea          # 文本域（多行文本）
+      rows: 4                      # 文本域行数
+      comment: 图书简介
+
+  # 字段11：图书封面
+  # 特性：图片上传（需要若依的图片上传组件支持）
+  - cover_image: varchar(500)      # 存储图片URL
+      query: none
+      list: true
+      component: image-upload      # 图片上传组件
+      comment: 图书封面
+
+  # =========================================================================
+  # 系统字段（自动生成，通常不需要手动配置）
+  # 这些字段若依会自动处理，不需要在fields中定义
+  # create_by, create_time, update_by, update_time, remark
+  # =========================================================================
+
+# -----------------------------------------------------------------------------
+# 【系统字段自动生成说明】
+# -----------------------------------------------------------------------------
+# 以下字段会自动添加，不需要在fields中配置：
+# - create_by: varchar(64)    创建者
+# - create_time: datetime     创建时间
+# - update_by: varchar(64)    更新者
+# - update_time: datetime     更新时间
+# - remark: varchar(500)      备注
+#
+# 这些字段会自动：
+# 1. 添加到数据库表
+# 2. 添加到Entity类（继承BaseEntity）
+# 3. 不在列表页显示（在详情/编辑页显示）
+# -----------------------------------------------------------------------------
+
+# =============================================================================
+# 【字段配置速查表】
+# =============================================================================
+#
+# 【数据类型】
+# - varchar(n)     字符串，n=最大长度
+# - char(n)        定长字符串
+# - int            整数
+# - bigint         长整数（主键常用）
+# - decimal(m,d)   小数，m=总长度，d=小数位
+# - date           日期（yyyy-MM-dd）
+# - datetime       日期时间（yyyy-MM-dd HH:mm:ss）
+# - text           大文本
+# - tinyint        小整数（0-255）
+#
+# 【必填标记】
+# - required: true     必填（数据库NOT NULL）
+# - required: false    可选（默认）
+#
+# 【查询方式】
+# - query: EQ          精确查询（=）
+# - query: LIKE        模糊查询（like '%值%'）
+# - query: BETWEEN     范围查询（日期/数字）
+# - query: none        不参与查询
+#
+# 【显示组件】
+# - component: input           文本输入框
+# - component: number          数字输入框
+# - component: select          下拉选择框（配合dict_type）
+# - component: radio           单选按钮组
+# - component: checkbox        多选框
+# - component: date-picker     日期选择器
+# - component: datetime-picker 日期时间选择器
+# - component: textarea        文本域（多行文本）
+# - component: image-upload    图片上传
+# - component: file-upload     文件上传
+# - component: editor          富文本编辑器
+#
+# 【校验规则】
+# - validation:
+#     min: 0              最小值（数字）
+#     max: 100            最大值（数字）
+#     pattern: regex      正则表达式
+#     email: true         邮箱格式
+#     phone: true         手机号格式
+#
+# 【系统字典】（可以直接使用的若依内置字典）
+# - sys_user_sex         用户性别（0男 1女 2未知）
+# - sys_normal_disable   状态（0正常 1停用）
+# - sys_show_hide        显示隐藏（0显示 1隐藏）
+# - sys_yes_no           是否（Y是 N否）
+#
+# =============================================================================

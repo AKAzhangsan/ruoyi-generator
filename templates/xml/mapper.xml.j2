@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="{{ packageName }}.mapper.{{ ClassName }}Mapper">
+
+    <resultMap type="{{ packageName }}.domain.{{ ClassName }}" id="{{ ClassName }}Result">
+{% for column in columns %}
+        <{% if column.is_pk %}id{% else %}result{% endif %} property="{{ column.java_field }}" column="{{ column.column_name }}"/>
+{% endfor %}
+    </resultMap>
+
+    <sql id="select{{ ClassName }}Vo">
+        select{% for column in columns %} {{ column.column_name }}{% if not loop.last %},{% endif %}{% endfor %} from {{ tableName }}
+    </sql>
+
+    <select id="select{{ ClassName }}List" parameterType="{{ packageName }}.domain.{{ ClassName }}" resultMap="{{ ClassName }}Result">
+        <include refid="select{{ ClassName }}Vo"/>
+        <where>
+{% for column in query_columns %}
+            <if test="{{ column.java_field }} != null {% if column.java_type == 'String' %}and {{ column.java_field }} != ''{% endif %}">
+                and {{ column.column_name }} {% if column.query_type == 'LIKE' %}like concat('%', #{{ '{' }}{{ column.java_field }}{{ '}' }}, '%'){% else %}= #{{ '{' }}{{ column.java_field }}{{ '}' }}{% endif %}
+            </if>
+{% endfor %}
+        </where>
+{% if tpl_type == "tree" %}
+        order by {% if tree_config and tree_config.tree_parent_code %}{{ tree_config.tree_parent_code }}, {% endif %}order_num
+{% endif %}
+    </select>
+
+    <select id="select{{ ClassName }}By{{ pkColumn.cap_java_field }}" parameterType="{{ pkColumn.java_type }}" resultMap="{{ ClassName }}Result">
+        <include refid="select{{ ClassName }}Vo"/>
+        where {{ pkColumn.column_name }} = #{{ '{' }}{{ pkColumn.java_field }}{{ '}' }}
+    </select>
+
+    <insert id="insert{{ ClassName }}" parameterType="{{ packageName }}.domain.{{ ClassName }}" useGeneratedKeys="true" keyProperty="{{ pkColumn.java_field }}">
+        insert into {{ tableName }}
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+{% for column in columns %}
+{% if column.column_name not in ['create_by', 'create_time', 'update_by', 'update_time'] %}
+            <if test="{{ column.java_field }} != null">{{ column.column_name }},</if>
+{% endif %}
+{% endfor %}
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+{% for column in columns %}
+{% if column.column_name not in ['create_by', 'create_time', 'update_by', 'update_time'] %}
+            <if test="{{ column.java_field }} != null">#{{ '{' }}{{ column.java_field }}{{ '}' }},</if>
+{% endif %}
+{% endfor %}
+        </trim>
+    </insert>
+
+    <update id="update{{ ClassName }}" parameterType="{{ packageName }}.domain.{{ ClassName }}">
+        update {{ tableName }}
+        <trim prefix="SET" suffixOverrides=",">
+{% for column in columns %}
+{% if column.column_name not in ['create_by', 'create_time', 'update_by', 'update_time'] %}
+            <if test="{{ column.java_field }} != null">{{ column.column_name }} = #{{ '{' }}{{ column.java_field }}{{ '}' }},</if>
+{% endif %}
+{% endfor %}
+        </trim>
+        where {{ pkColumn.column_name }} = #{{ '{' }}{{ pkColumn.java_field }}{{ '}' }}
+    </update>
+
+    <delete id="delete{{ ClassName }}By{{ pkColumn.cap_java_field }}" parameterType="{{ pkColumn.java_type }}">
+        delete from {{ tableName }} where {{ pkColumn.column_name }} = #{{ '{' }}{{ pkColumn.java_field }}{{ '}' }}
+    </delete>
+
+    <delete id="delete{{ ClassName }}By{{ pkColumn.cap_java_field }}s" parameterType="String">
+        delete from {{ tableName }} where {{ pkColumn.column_name }} in
+        <foreach collection="array" item="{{ pkColumn.java_field }}" open="(" separator="," close=")">
+            #{{ '{' }}{{ pkColumn.java_field }}{{ '}' }}
+        </foreach>
+    </delete>
+
+</mapper>

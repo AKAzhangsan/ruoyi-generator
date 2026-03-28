@@ -1,0 +1,28 @@
+-- {{ functionName }}菜单SQL
+-- 自动生成于 {{ datetime }}
+
+-- 删除已存在的菜单（根据权限标识删除所有相关菜单）
+DELETE FROM sys_menu WHERE perms LIKE '{{ permissionPrefix }}:%';
+
+-- 插入目录菜单
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) 
+VALUES ('{{ functionName }}', {{ parentMenuId }}, {{ sort | default(1) }}, '{{ businessName }}', NULL, 1, 0, 'M', '0', '0', '{{ permissionPrefix }}:manage', 'list', '{{ author }}', NOW(), '{{ functionName }}目录');
+
+SET @parentId = LAST_INSERT_ID();
+
+-- 插入菜单
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) 
+VALUES ('{{ functionName }}', @parentId, 1, '{{ businessName }}', '{{ moduleName }}/{{ businessName }}/index', 1, 0, 'C', '0', '0', '{{ permissionPrefix }}:list', 'list', '{{ author }}', NOW(), '{{ functionName }}菜单');
+
+-- 插入按钮权限
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) 
+VALUES ('{{ functionName }}新增', @parentId, 2, '#', '', 1, 0, 'F', '0', '0', '{{ permissionPrefix }}:add', '#', '{{ author }}', NOW(), '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) 
+VALUES ('{{ functionName }}修改', @parentId, 3, '#', '', 1, 0, 'F', '0', '0', '{{ permissionPrefix }}:edit', '#', '{{ author }}', NOW(), '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) 
+VALUES ('{{ functionName }}删除', @parentId, 4, '#', '', 1, 0, 'F', '0', '0', '{{ permissionPrefix }}:remove', '#', '{{ author }}', NOW(), '');
+
+INSERT INTO sys_menu (menu_name, parent_id, order_num, path, component, is_frame, is_cache, menu_type, visible, status, perms, icon, create_by, create_time, remark) 
+VALUES ('{{ functionName }}导出', @parentId, 5, '#', '', 1, 0, 'F', '0', '0', '{{ permissionPrefix }}:export', '#', '{{ author }}', NOW(), '');

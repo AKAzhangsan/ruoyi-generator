@@ -1,0 +1,17 @@
+dict_type: sys_mvp4_yes_no
+dict_name: MVP4是否
+source_table: mvp4_full_components
+generated_at: '2026-03-26T15:54:09.685375'
+data:
+- label: 是
+  value: '1'
+  sort: 1
+  is_default: Y
+  list_class: ''
+  status: '0'
+- label: 否
+  value: '0'
+  sort: 2
+  is_default: N
+  list_class: ''
+  status: '0'
